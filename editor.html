@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポートフォリオ編集ツール</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #FFA500;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .editor-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #FFA500;
+            outline: none;
+        }
+
+        textarea {
+            height: 180px;
+            resize: vertical;
+        }
+
+        .file-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-input-group input[type="text"] {
+            flex: 1;
+        }
+
+        button.action-btn {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 2px 5px rgba(255, 165, 0, 0.3);
+        }
+
+        button.action-btn:hover {
+            background-color: #ff8c00;
+        }
+
+        button.action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .output-section {
+            margin-top: 40px;
+            border-top: 2px dashed #ddd;
+            padding-top: 30px;
+            display: none;
+        }
+
+        .output-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .output-box {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background-color: #333;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 0;
+            padding-left: 10px;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            color: #666;
+            transition: background 0.2s;
+        }
+
+        .tab.active {
+            background: #FFA500;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #d0d0d0;
+        }
+
+        .instruction-box {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .step-badge {
+            display: inline-block;
+            background: #2e7d32;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>KonDo 紹介ページ 編集ツール</h1>
+    <p class="intro-text">
+        セキュリティの制約により、ここから直接ファイルの上書きはできません。<br>
+        このツールでコードを作成し、それをコピーして、元のHTMLファイルに貼り付けるだけで更新できます。
+    </p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('game-detail')">1. ゲーム詳細ページ用</div>
+        <div class="tab" onclick="switchTab('top-link')">2. トップページ用リンク</div>
+        <div class="tab" onclick="switchTab('profile')">3. 経歴(プロフィール)</div>
+        <div class="tab" onclick="switchTab('schedule')">4. スケジュール</div>
+    </div>
+
+    <div class="editor-container">
+
+        <!-- ゲーム詳細ページ用フォーム -->
+        <div id="form-game-detail">
+            <h3>ゲーム詳細ページの作成</h3>
+            <p style="margin-bottom:20px; color:#666;">
+                新しく <code>game01.html</code> などのファイルを作った後、この内容を貼り付けます。
+            </p>
+
+            <div class="form-group">
+                <label>ゲームのタイトル</label>
+                <input type="text" id="game-title" placeholder="例: ボウリングゲーム">
+            </div>
+
+            <div class="form-group">
+                <label>画像ファイル (imagesフォルダ等の画像)</label>
+                <div class="file-input-group">
+                    <input type="text" id="game-image" placeholder="画像ファイル名 (または選択→)">
+                    <!-- ファイル選択ボタン (見かけ上) -->
+                    <input type="file" id="game-image-picker" accept="image/*" onchange="pickFile('game-image', this)"
+                        style="width: auto;">
+                </div>
+                <p class="note">※選択した画像ファイルは、ご自身でプロジェクトフォルダにコピーしてください。</p>
+            </div>
+
+            <div class="form-group">
+                <label>紹介文</label>
+                <textarea id="game-desc" placeholder="ゲームの遊び方やこだわりポイントなどを書いてください..."></textarea>
+            </div>
+            <button class="action-btn" onclick="generateGameDetail()">更新用コードを作成</button>
+        </div>
+
+        <!-- トップページ用リンクフォーム -->
+        <div id="form-top-link" style="display:none;">
+            <h3>トップページ (index.html) のゲーム一覧に追加</h3>
+
+            <div class="form-group">
+                <label>ゲームのタイトル</label>
+                <input type="text" id="link-title" placeholder="例: ボウリングゲーム">
+            </div>
+            <div class="form-group">
+                <label>リンク先のファイル名</label>
+                <input type="text" id="link-file" placeholder="例: game01.html">
+            </div>
+            <button class="action-btn" onclick="generateLink()">更新用コードを作成</button>
+        </div>
+
+        <!-- プロフィールフォーム -->
+        <div id="form-profile" style="display:none;">
+            <h3>経歴 (index.html) の編集</h3>
+
+            <div class="form-group">
+                <label>お名前 (表示名)</label>
+                <input type="text" id="prof-name" placeholder="KonDo">
+            </div>
+            <div class="form-group">
+                <label>自己紹介・経歴文</label>
+                <textarea id="prof-bio" placeholder="これまでの経歴や、現在の活動などを書いてください..."></textarea>
+            </div>
+            <button class="action-btn" onclick="generateProfile()">更新用コードを作成</button>
+        </div>
+
+        <!-- スケジュール用フォーム -->
+        <div id="form-schedule" style="display:none;">
+            <h3>スケジュール (index.html) の追加</h3>
+
+            <div class="form-group">
+                <label>日付</label>
+                <input type="text" id="sched-date" placeholder="例: 2024.12.25">
+            </div>
+            <div class="form-group">
+                <label>イベント内容</label>
+                <input type="text" id="sched-event" placeholder="例: クリスマスイベント">
+            </div>
+            <button class="action-btn" onclick="generateSchedule()">更新用コードを作成</button>
+        </div>
+
+        <!-- 結果出力エリア -->
+        <div id="output-section" class="output-section">
+            <div class="instruction-box">
+                <span class="step-badge">OK</span> <span id="instruction-title"
+                    style="font-weight:bold;">コードが作成されました！</span><br>
+                下の黒いボックスの中身をコピーして、<br>
+                <span id="instruction-target" style="font-weight:bold; color:#d32f2f;">対象ファイル</span> の <span
+                    id="instruction-place" style="font-weight:bold; color:#d32f2f;">対象の場所</span> に貼り付けて（上書きして）ください。
+            </div>
+
+            <div class="output-title">
+                生成されたコード
+                <button class="copy-btn" onclick="copyToClipboard()">コピーする</button>
+            </div>
+            <div id="output-box" class="output-box"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(mode) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            ['form-game-detail', 'form-top-link', 'form-profile', 'form-schedule'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById('output-section').style.display = 'none';
+
+            if (mode === 'game-detail') document.getElementById('form-game-detail').style.display = 'block';
+            if (mode === 'top-link') document.getElementById('form-top-link').style.display = 'block';
+            if (mode === 'profile') document.getElementById('form-profile').style.display = 'block';
+            if (mode === 'schedule') document.getElementById('form-schedule').style.display = 'block';
+        }
+
+        function pickFile(targetId, input) {
+            if (input.files && input.files.length > 0) {
+                // セキュリティ上フルパスは取れないのでファイル名だけ取得
+                document.getElementById(targetId).value = input.files[0].name;
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function nl2br(text) {
+            return escapeHtml(text).replace(/\n/g, "<br>\n");
+        }
+
+        function showOutput(code, targetFile, place) {
+            const out = document.getElementById('output-box');
+            out.innerText = code;
+            document.getElementById('output-section').style.display = 'block';
+
+            document.getElementById('instruction-target').innerText = targetFile;
+            document.getElementById('instruction-place').innerText = place;
+
+            // スクロールして結果を見せる
+            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateGameDetail() {
+            const title = document.getElementById('game-title').value;
+            const img = document.getElementById('game-image').value;
+            const desc = document.getElementById('game-desc').value;
+
+            let imgTag = '<div class="game-detail-image">\n    <span>画像なし</span>\n</div>';
+            if (img.trim() !== "") {
+                imgTag = `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" class="game-detail-image">`;
+            }
+
+            const code = `<!-- ${escapeHtml(title)} の詳細 -->
+<article class="game-detail">
+    <header class="game-detail-header">
+        <h2 class="game-detail-title">${escapeHtml(title)}</h2>
+    </header>
+
+    ${imgTag}
+
+    <div class="game-detail-body">
+        <p>
+${nl2br(desc)}
+        </p>
+    </div>
+
+    <a href="index.html" class="back-link">← トップに戻る</a>
+</article>`;
+
+            showOutput(code, "作成したHTMLファイル (例: game01.html)", "<main> タグの内側");
+        }
+
+        function generateLink() {
+            const title = document.getElementById('link-title').value;
+            const file = document.getElementById('link-file').value;
+
+            const code = `<li class="game-link-item">
+    <a href="${escapeHtml(file)}" class="game-link">
+        <span class="arrow">▶</span> ${escapeHtml(title)}
+    </a>
+</li>`;
+            showOutput(code, "index.html", "<ul class=\"game-link-list\"> の中");
+        }
+
+        function generateProfile() {
+            const name = document.getElementById('prof-name').value;
+            const bio = document.getElementById('prof-bio').value;
+
+            const code = `<div class="profile-text">
+    <!-- 名前 -->
+    <p class="name">${escapeHtml(name)}</p>
+    <!-- 自己紹介文 -->
+    <p class="bio">
+${nl2br(bio)}
+    </p>
+</div>`;
+            showOutput(code, "index.html", "<div class=\"profile-text\"> の中 (上書き)");
+        }
+
+        function generateSchedule() {
+            const date = document.getElementById('sched-date').value;
+            const evt = document.getElementById('sched-event').value;
+
+            const code = `<div class="schedule-item">
+    <div class="date">${escapeHtml(date)}</div>
+    <div class="event">${escapeHtml(evt)}</div>
+</div>`;
+            showOutput(code, "index.html", "<div class=\"schedule-list\"> の中");
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('output-box').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('コピーしました！\n対象のファイルに貼り付けてください。');
+            });
+        }
+    </script>
+
+</body>
+
+</html>

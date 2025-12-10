@@ -1,0 +1,275 @@
+/* ==========================================================================
+   基本設定 (Reset & Base Styles)
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* フォントの設定: Noto Sans JP を優先 */
+    font-family: 'Noto Sans JP', "Helvetica Neue", Arial, sans-serif;
+    background-color: #ffffff;
+    /* 全体の背景色: 白 */
+    color: #333333;
+    /* 全体の文字色: 濃いグレー（真っ黒より目に優しい） */
+    line-height: 1.8;
+    /* 行間を広めにとって読みやすく */
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s;
+}
+
+a:hover {
+    opacity: 0.7;
+    /* リンクにカーソルを合わせた時に少し薄くする */
+}
+
+ul {
+    list-style: none;
+}
+
+/* ==========================================================================
+   レイアウト (Layout)
+   ========================================================================== */
+.container {
+    max-width: 800px;
+    /* 横幅の最大値。これ以上は広がらない */
+    margin: 0 auto;
+    /* 中央寄せ */
+    padding: 0 20px;
+    /* 左右に余白 */
+}
+
+/* ==========================================================================
+   ヘッダー (Header)
+   ========================================================================== */
+.site-header {
+    background-color: #FFA500;
+    /* 背景色: オレンジ */
+    padding: 60px 0 40px;
+    /* 上60px, 下40pxの余白 */
+    margin-bottom: 60px;
+}
+
+.site-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    /* タイトル文字色: 白 */
+}
+
+.site-nav ul {
+    display: flex;
+    gap: 30px;
+    /* メニュー項目の間隔 */
+}
+
+.site-nav a {
+    font-size: 1rem;
+    color: #ffffff;
+    /* メニュー文字色: 白 */
+    font-weight: 700;
+}
+
+.site-nav a:hover {
+    color: #333333;
+    /* ホバー時に濃い色へ */
+}
+
+/* ==========================================================================
+   メインコンテンツ (Main Content Sections)
+   ========================================================================== */
+.content-section {
+    margin-bottom: 100px;
+    /* セクションごとの間隔を広めに */
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    font-weight: 700;
+    border-bottom: 1px solid #eeeeee;
+    /* 薄い下線 */
+    padding-bottom: 10px;
+    display: block;
+    /* 横幅いっぱいに線を引く */
+}
+
+.section-description {
+    margin-bottom: 40px;
+    color: #666666;
+}
+
+/* 1. プロフィール (Profile) */
+.profile-card {
+    padding: 20px 0;
+}
+
+.name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.bio {
+    color: #444444;
+}
+
+/* 2. ゲーム紹介 (Games) */
+/* トップページではリスト形式で表示 */
+.game-link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.game-link-item {
+    border-bottom: 1px solid #f2f2f2;
+    padding-bottom: 15px;
+}
+
+.game-link {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #fcfcfc;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.game-link:hover {
+    background-color: #f0f0f0;
+    color: #FFA500;
+    /* ホバー時にオレンジ色に */
+}
+
+.game-link .arrow {
+    margin-right: 15px;
+    color: #FFA500;
+    font-size: 0.9rem;
+}
+
+/* 旧スタイル（game_page.html 等で使うかもしれないので残すか、削除するか。今回は念のため残すが、index.htmlからは参照されなくなる） */
+/* .game-list, .game-item 等は削除しても良いが、影響範囲を最小限にするため一旦コメントアウトまたはそのままにしておく */
+/*
+.game-list { ... }
+*/
+
+.game-list {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    /* ゲームごとの間隔 */
+}
+
+.game-item {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+
+.game-image-placeholder {
+    width: 100%;
+    height: 300px;
+    /* 画像エリアの高さ */
+    background-color: #f9f9f9;
+    /* 画像がない時の背景色: 非常に薄いグレー */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    color: #cccccc;
+    font-weight: bold;
+    border-radius: 4px;
+    overflow: hidden;
+    /* 画像がはみ出ないようにする */
+}
+
+.game-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 画像の比率を保ちつつエリアを埋める */
+}
+
+.game-title {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.game-description {
+    color: #555555;
+    font-size: 1rem;
+}
+
+/* 3. 予定 (Schedule) */
+.schedule-item {
+    display: flex;
+    padding: 20px 0;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.schedule-item .date {
+    width: 140px;
+    font-weight: bold;
+    color: #999999;
+    font-size: 0.95rem;
+}
+
+.schedule-item .event {
+    flex: 1;
+}
+
+/* ==========================================================================
+   フッター (Footer)
+   ========================================================================== */
+.site-footer {
+    padding: 60px 0;
+    border-top: 1px solid #f2f2f2;
+    text-align: center;
+    color: #aaaaaa;
+    font-size: 0.8rem;
+    margin-top: 80px;
+}
+
+/* ==========================================================================
+   レスポンシブ (Responsive) - スマホ向け調整
+   ========================================================================== */
+@media (max-width: 600px) {
+    .site-header {
+        padding: 40px 0 20px;
+    }
+
+    .site-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .game-image-placeholder {
+        height: 200px;
+        /* スマホでは画像の高さを少し抑える */
+    }
+
+    .schedule-item .date {
+        width: 100px;
+    }
+}

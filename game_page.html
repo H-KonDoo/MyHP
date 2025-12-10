@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 検索エンジンに表示させない設定 -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>ゲーム詳細 - KonDoの紹介ページ</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- フォントの読み込み（Noto Sans JP） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ゲーム詳細ページ専用のスタイル */
+        .game-detail-header {
+            margin-bottom: 40px;
+        }
+
+        .game-detail-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .game-detail-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            background-color: #f9f9f9;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        .game-detail-body {
+            font-size: 1.1rem;
+            line-height: 2;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 60px;
+            font-weight: bold;
+            color: #FFA500;
+            /* テーマカラーに合わせる */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header">
+        <div class="container">
+            <h1 class="site-title"><a href="index.html" style="color: white;">KonDoの紹介ページ</a></h1>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="index.html#profile">経歴</a></li>
+                    <li><a href="index.html#games">ゲーム紹介</a></li>
+                    <li><a href="index.html#schedule">予定</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <article class="game-detail">
+            <header class="game-detail-header">
+                <h2 class="game-detail-title">ゲームタイトル</h2>
+            </header>
+
+            <!-- 画像エリア -->
+            <!-- <img src="images/game01.jpg" alt="ゲーム画像" class="game-detail-image"> のように書き換えます -->
+            <div class="game-detail-image">
+                <span>ここにゲームの画像が入ります</span>
+            </div>
+
+            <div class="game-detail-body">
+                <p>
+                    ここにゲームの紹介文が入ります。<br>
+                    このページはテンプレートです。新しいゲーム紹介ページを作るときは、このファイルをコピーしてファイル名を変え（例: game02.html）、
+                    中身を書き換えてください。<br><br>
+                    エディタツールを使うと、ここの文章を作成することができます。
+                </p>
+            </div>
+
+            <a href="index.html" class="back-link">← トップに戻る</a>
+        </article>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2023 KonDo Portfolio</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

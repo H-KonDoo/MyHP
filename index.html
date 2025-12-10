@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 検索エンジンに表示させない設定 -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>KonDoの紹介ページ</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- フォントの読み込み（Noto Sans JP） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ヘッダー（ページの上部） -->
+    <header class="site-header">
+        <div class="container">
+            <!-- サイトのタイトル -->
+            <h1 class="site-title">KonDoの紹介ページ</h1>
+            <!-- ナビゲーションメニュー -->
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="#profile">経歴</a></li>
+                    <li><a href="#games">ゲーム紹介</a></li>
+                    <li><a href="#schedule">予定</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- ==========================================
+             1. プロフィール (経歴) セクション
+             ========================================== -->
+        <section id="profile" class="content-section">
+            <h2 class="section-title">Profile (経歴)</h2>
+            <div class="profile-card">
+                <div class="profile-text">
+                    <!-- 名前 -->
+                    <p class="name">KonDo</p>
+                    <!-- 自己紹介文。改行したい場合は <br> を入れてください -->
+                    <p class="bio">
+                        ここに自己紹介や経歴を入力してください。<br>
+                        どのような活動をしてきたか、現在は何をしているかなどを記載します。<br>
+                        デザインはシンプルに白を基調としています。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             2. ゲーム紹介 セクション
+             ========================================== -->
+        <section id="games" class="content-section">
+            <h2 class="section-title">Games (ゲーム紹介)</h2>
+            <p class="section-description">これまでに作成したゲームの一覧です。タイトルをクリックすると詳細ページへ移動します。</p>
+
+            <ul class="game-link-list">
+                <!-- ゲームリンク 1つ目 -->
+                <!-- href="game01.html" の部分を作成した詳細ページの名前に書き換えてください -->
+                <li class="game-link-item">
+                    <a href="game_page.html" class="game-link">
+                        <span class="arrow">▶</span> ゲームタイトル 01
+                    </a>
+                </li>
+
+                <!-- ゲームリンク 2つ目 -->
+                <li class="game-link-item">
+                    <a href="#" class="game-link">
+                        <span class="arrow">▶</span> ゲームタイトル 02 (ページ準備中)
+                    </a>
+                </li>
+
+                <!-- 新しいゲームはここに追加されます -->
+                <!-- LINK_INSERTION_POINT -->
+            </ul>
+        </section>
+
+        <!-- ==========================================
+             3. 予定 (スケジュール) セクション
+             ========================================== -->
+        <section id="schedule" class="content-section">
+            <h2 class="section-title">Schedule (予定)</h2>
+            <div class="schedule-list">
+                <!-- 予定 1行目 -->
+                <div class="schedule-item">
+                    <div class="date">2023.12.20</div>
+                    <div class="event">Webサイト公開</div>
+                </div>
+                <!-- 予定 2行目 -->
+                <div class="schedule-item">
+                    <div class="date">2024.01.15</div>
+                    <div class="event">新作ゲーム リリース予定</div>
+                </div>
+                <!-- 予定 3行目 -->
+                <div class="schedule-item">
+                    <div class="date">2024.02.01</div>
+                    <div class="event">イベント参加</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- フッター（ページの下部） -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2023 My Portfolio</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
