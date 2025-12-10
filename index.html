@@ -39,15 +39,8 @@
         <section id="profile" class="content-section">
             <h2 class="section-title">Profile (経歴)</h2>
             <div class="profile-card">
-                <div class="profile-text">
-                    <!-- 名前 -->
-                    <p class="name">KonDo</p>
-                    <!-- 自己紹介文。改行したい場合は <br> を入れてください -->
-                    <p class="bio">
-                        ここに自己紹介や経歴を入力してください。<br>
-                        どのような活動をしてきたか、現在は何をしているかなどを記載します。<br>
-                        デザインはシンプルに白を基調としています。
-                    </p>
+                <div class="profile-text" id="profile-display">
+                    <!-- ここに data.js の内容が表示されます -->
                 </div>
             </div>
         </section>
@@ -59,24 +52,8 @@
             <h2 class="section-title">Games (ゲーム紹介)</h2>
             <p class="section-description">これまでに作成したゲームの一覧です。タイトルをクリックすると詳細ページへ移動します。</p>
 
-            <ul class="game-link-list">
-                <!-- ゲームリンク 1つ目 -->
-                <!-- href="game01.html" の部分を作成した詳細ページの名前に書き換えてください -->
-                <li class="game-link-item">
-                    <a href="game_page.html" class="game-link">
-                        <span class="arrow">▶</span> ゲームタイトル 01
-                    </a>
-                </li>
-
-                <!-- ゲームリンク 2つ目 -->
-                <li class="game-link-item">
-                    <a href="#" class="game-link">
-                        <span class="arrow">▶</span> ゲームタイトル 02 (ページ準備中)
-                    </a>
-                </li>
-
-                <!-- 新しいゲームはここに追加されます -->
-                <!-- LINK_INSERTION_POINT -->
+            <ul class="game-link-list" id="games-list-display">
+                <!-- ここに data.js の内容が表示されます -->
             </ul>
         </section>
 
@@ -85,32 +62,75 @@
              ========================================== -->
         <section id="schedule" class="content-section">
             <h2 class="section-title">Schedule (予定)</h2>
-            <div class="schedule-list">
-                <!-- 予定 1行目 -->
-                <div class="schedule-item">
-                    <div class="date">2023.12.20</div>
-                    <div class="event">Webサイト公開</div>
-                </div>
-                <!-- 予定 2行目 -->
-                <div class="schedule-item">
-                    <div class="date">2024.01.15</div>
-                    <div class="event">新作ゲーム リリース予定</div>
-                </div>
-                <!-- 予定 3行目 -->
-                <div class="schedule-item">
-                    <div class="date">2024.02.01</div>
-                    <div class="event">イベント参加</div>
-                </div>
+            <div class="schedule-list" id="schedule-display">
+                <!-- ここに data.js の内容が表示されます -->
             </div>
         </section>
     </main>
 
-    <!-- フッター（ページの下部） -->
+    <!-- フッター -->
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2023 My Portfolio</p>
+            <p>&copy; 2023 KonDo Portfolio</p>
         </div>
     </footer>
+
+    <!-- データと表示用スクリプトの読み込み -->
+    <script src="data.js"></script>
+    <script>
+        // DOM読み込み完了後に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof portfolioData === 'undefined') {
+                console.error("data.js が正しく読み込まれていません。");
+                return;
+            }
+
+            // 1. プロフィールの表示
+            const profileArea = document.getElementById('profile-display');
+            profileArea.innerHTML = `
+                <p class="name">${escapeHtml(portfolioData.profile.name)}</p>
+                <p class="bio">${portfolioData.profile.bio}</p>
+            `;
+
+            // 2. ゲームリストの表示
+            const gamesList = document.getElementById('games-list-display');
+            let gamesHtml = '';
+            portfolioData.games.forEach(game => {
+                gamesHtml += `
+                    <li class="game-link-item">
+                        <a href="game_page.html?id=${game.id}" class="game-link">
+                            <span class="arrow">▶</span> ${escapeHtml(game.title)}
+                        </a>
+                    </li>
+                `;
+            });
+            gamesList.innerHTML = gamesHtml;
+
+            // 3. スケジュールの表示
+            const scheduleArea = document.getElementById('schedule-display');
+            let scheduleHtml = '';
+            portfolioData.schedule.forEach(item => {
+                scheduleHtml += `
+                    <div class="schedule-item">
+                        <div class="date">${escapeHtml(item.date)}</div>
+                        <div class="event">${escapeHtml(item.event)}</div>
+                    </div>
+                `;
+            });
+            scheduleArea.innerHTML = scheduleHtml;
+        });
+
+        // XSS対策用エスケープ関数
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
 
 </body>
 

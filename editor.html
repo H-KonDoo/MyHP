@@ -203,240 +203,268 @@
 
 <body>
 
-    <h1>KonDo 紹介ページ 編集ツール</h1>
+    <h1>KonDo 紹介ページ 管理ツール</h1>
     <p class="intro-text">
-        セキュリティの制約により、ここから直接ファイルの上書きはできません。<br>
-        このツールでコードを作成し、それをコピーして、元のHTMLファイルに貼り付けるだけで更新できます。
+        このツールで内容を編集し、最後に「保存用データを作成」ボタンを押してください。<br>
+        作成されたデータで <code>data.js</code> を上書き保存すると、ホームページ全体が更新されます。
     </p>
 
+    <!-- タブ切り替え -->
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('game-detail')">1. ゲーム詳細ページ用</div>
-        <div class="tab" onclick="switchTab('top-link')">2. トップページ用リンク</div>
-        <div class="tab" onclick="switchTab('profile')">3. 経歴(プロフィール)</div>
-        <div class="tab" onclick="switchTab('schedule')">4. スケジュール</div>
+        <div class="tab active" onclick="switchTab('profile')">1. 経歴 (プロフィール)</div>
+        <div class="tab" onclick="switchTab('games')">2. ゲームリスト</div>
+        <div class="tab" onclick="switchTab('schedule')">3. スケジュール</div>
+        <div class="tab" style="background:#4CAF50; color:white;" onclick="generateDataFile()">★ 保存用データ作成</div>
     </div>
 
     <div class="editor-container">
 
-        <!-- ゲーム詳細ページ用フォーム -->
-        <div id="form-game-detail">
-            <h3>ゲーム詳細ページの作成</h3>
-            <p style="margin-bottom:20px; color:#666;">
-                新しく <code>game01.html</code> などのファイルを作った後、この内容を貼り付けます。
-            </p>
-
+        <!-- ==============================================
+             1. プロフィール編集
+             ============================================== -->
+        <div id="view-profile">
+            <h3>プロフィール編集</h3>
             <div class="form-group">
-                <label>ゲームのタイトル</label>
-                <input type="text" id="game-title" placeholder="例: ボウリングゲーム">
+                <label>名前</label>
+                <input type="text" id="prof-name">
             </div>
-
             <div class="form-group">
-                <label>画像ファイル (imagesフォルダ等の画像)</label>
-                <div class="file-input-group">
-                    <input type="text" id="game-image" placeholder="画像ファイル名 (または選択→)">
-                    <!-- ファイル選択ボタン (見かけ上) -->
-                    <input type="file" id="game-image-picker" accept="image/*" onchange="pickFile('game-image', this)"
-                        style="width: auto;">
-                </div>
-                <p class="note">※選択した画像ファイルは、ご自身でプロジェクトフォルダにコピーしてください。</p>
+                <label>自己紹介文</label>
+                <textarea id="prof-bio"></textarea>
             </div>
-
-            <div class="form-group">
-                <label>紹介文</label>
-                <textarea id="game-desc" placeholder="ゲームの遊び方やこだわりポイントなどを書いてください..."></textarea>
-            </div>
-            <button class="action-btn" onclick="generateGameDetail()">更新用コードを作成</button>
         </div>
 
-        <!-- トップページ用リンクフォーム -->
-        <div id="form-top-link" style="display:none;">
-            <h3>トップページ (index.html) のゲーム一覧に追加</h3>
-
-            <div class="form-group">
-                <label>ゲームのタイトル</label>
-                <input type="text" id="link-title" placeholder="例: ボウリングゲーム">
-            </div>
-            <div class="form-group">
-                <label>リンク先のファイル名</label>
-                <input type="text" id="link-file" placeholder="例: game01.html">
-            </div>
-            <button class="action-btn" onclick="generateLink()">更新用コードを作成</button>
+        <!-- ==============================================
+             2. ゲームリスト編集
+             ============================================== -->
+        <div id="view-games" style="display:none;">
+            <h3>ゲームリスト編集</h3>
+            <div id="games-container"></div>
+            <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addGame()">＋ ゲームを追加する</button>
         </div>
 
-        <!-- プロフィールフォーム -->
-        <div id="form-profile" style="display:none;">
-            <h3>経歴 (index.html) の編集</h3>
-
-            <div class="form-group">
-                <label>お名前 (表示名)</label>
-                <input type="text" id="prof-name" placeholder="KonDo">
-            </div>
-            <div class="form-group">
-                <label>自己紹介・経歴文</label>
-                <textarea id="prof-bio" placeholder="これまでの経歴や、現在の活動などを書いてください..."></textarea>
-            </div>
-            <button class="action-btn" onclick="generateProfile()">更新用コードを作成</button>
+        <!-- ==============================================
+             3. スケジュール編集
+             ============================================== -->
+        <div id="view-schedule" style="display:none;">
+            <h3>スケジュール編集</h3>
+            <div id="schedule-container"></div>
+            <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addSchedule()">＋
+                予定を追加する</button>
         </div>
 
-        <!-- スケジュール用フォーム -->
-        <div id="form-schedule" style="display:none;">
-            <h3>スケジュール (index.html) の追加</h3>
-
-            <div class="form-group">
-                <label>日付</label>
-                <input type="text" id="sched-date" placeholder="例: 2024.12.25">
-            </div>
-            <div class="form-group">
-                <label>イベント内容</label>
-                <input type="text" id="sched-event" placeholder="例: クリスマスイベント">
-            </div>
-            <button class="action-btn" onclick="generateSchedule()">更新用コードを作成</button>
-        </div>
-
-        <!-- 結果出力エリア -->
-        <div id="output-section" class="output-section">
+        <!-- ==============================================
+             4. データ出力 (保存)
+             ============================================== -->
+        <div id="view-output" style="display:none;">
             <div class="instruction-box">
-                <span class="step-badge">OK</span> <span id="instruction-title"
-                    style="font-weight:bold;">コードが作成されました！</span><br>
-                下の黒いボックスの中身をコピーして、<br>
-                <span id="instruction-target" style="font-weight:bold; color:#d32f2f;">対象ファイル</span> の <span
-                    id="instruction-place" style="font-weight:bold; color:#d32f2f;">対象の場所</span> に貼り付けて（上書きして）ください。
+                <span class="step-badge">重要</span> <b>更新手順</b><br>
+                1. 下の「コードをコピーする」ボタンを押します。<br>
+                2. <b><code>data.js</code></b> ファイルをメモ帳などで開きます。<br>
+                3. 中身をすべて消して、貼り付け（上書き）て保存してください。<br>
+                4. <code>index.html</code> を開くと更新されています。
             </div>
 
             <div class="output-title">
-                生成されたコード
-                <button class="copy-btn" onclick="copyToClipboard()">コピーする</button>
+                保存用データ (data.js)
+                <button class="copy-btn" onclick="copyToClipboard()">コードをコピーする</button>
             </div>
             <div id="output-box" class="output-box"></div>
         </div>
 
     </div>
 
+    <!-- 既存データの読み込み -->
+    <script src="data.js"></script>
     <script>
+        // 作業用変数
+        let currentData = {
+            profile: { name: "", bio: "" },
+            games: [],
+            schedule: []
+        };
+
+        // ページ読み込み時に data.js の内容をフォームにセット
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof portfolioData !== 'undefined') {
+                // ディープコピーで読み込み
+                currentData = JSON.parse(JSON.stringify(portfolioData));
+                initForms();
+            } else {
+                alert("data.js が見つかりませんでした。新規作成モードで開始します。");
+            }
+        });
+
+        function initForms() {
+            // プロフィール
+            document.getElementById('prof-name').value = currentData.profile.name;
+            document.getElementById('prof-bio').value = currentData.profile.bio.replace(/<br>/g, "\n");
+
+            // ゲーム
+            renderGamesList();
+
+            // スケジュール
+            renderScheduleList();
+        }
+
         function switchTab(mode) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            // Save current inputs to memory before switching
+            saveCurrentInputsToMemory();
 
-            ['form-game-detail', 'form-top-link', 'form-profile', 'form-schedule'].forEach(id => {
-                document.getElementById(id).style.display = 'none';
+            document.getElementById('view-profile').style.display = 'none';
+            document.getElementById('view-games').style.display = 'none';
+            document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-output').style.display = 'none';
+
+            if (mode === 'profile') {
+                document.getElementById('view-profile').style.display = 'block';
+                event.target.classList.add('active');
+            }
+            if (mode === 'games') {
+                document.getElementById('view-games').style.display = 'block';
+                event.target.classList.add('active');
+            }
+            if (mode === 'schedule') {
+                document.getElementById('view-schedule').style.display = 'block';
+                event.target.classList.add('active');
+            }
+        }
+
+        function saveCurrentInputsToMemory() {
+            // Profile
+            currentData.profile.name = document.getElementById('prof-name').value;
+            currentData.profile.bio = document.getElementById('prof-bio').value.replace(/\n/g, "<br>");
+
+            // Games & Schedule are updated live via inputs, no global save needed for lists specifically
+            // because input onchange events handle them.
+        }
+
+        // ================= GAMES =================
+        function renderGamesList() {
+            const container = document.getElementById('games-container');
+            container.innerHTML = "";
+            currentData.games.forEach((game, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.style.border = "1px solid #ddd";
+                div.style.padding = "15px";
+                div.style.marginBottom = "20px";
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <strong>ゲーム #${index + 1} (ID: ${game.id})</strong>
+                        <button onclick="removeGame(${index})" style="background:#d32f2f; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">削除</button>
+                    </div>
+                    <label>タイトル</label>
+                    <input type="text" value="${escapeAttr(game.title)}" onchange="updateGame(${index}, 'title', this.value)">
+                    
+                    <label style="margin-top:10px;">ID (英数字推奨)</label>
+                    <input type="text" value="${escapeAttr(game.id)}" onchange="updateGame(${index}, 'id', this.value)">
+
+                    <label style="margin-top:10px;">画像ファイル名</label>
+                    <input type="text" value="${escapeAttr(game.image)}" onchange="updateGame(${index}, 'image', this.value)">
+                    
+                    <label style="margin-top:10px;">紹介文</label>
+                    <textarea onchange="updateGame(${index}, 'description', this.value)" style="height:100px;">${game.description}</textarea>
+                `;
+                container.appendChild(div);
             });
-            document.getElementById('output-section').style.display = 'none';
-
-            if (mode === 'game-detail') document.getElementById('form-game-detail').style.display = 'block';
-            if (mode === 'top-link') document.getElementById('form-top-link').style.display = 'block';
-            if (mode === 'profile') document.getElementById('form-profile').style.display = 'block';
-            if (mode === 'schedule') document.getElementById('form-schedule').style.display = 'block';
         }
 
-        function pickFile(targetId, input) {
-            if (input.files && input.files.length > 0) {
-                // セキュリティ上フルパスは取れないのでファイル名だけ取得
-                document.getElementById(targetId).value = input.files[0].name;
+        function addGame() {
+            const newId = "game" + (new Date().getTime());
+            currentData.games.push({
+                id: newId,
+                title: "新規ゲーム",
+                image: "",
+                description: "紹介文を入力"
+            });
+            renderGamesList();
+        }
+
+        function removeGame(index) {
+            if (confirm("このゲームを削除してもよろしいですか？")) {
+                currentData.games.splice(index, 1);
+                renderGamesList();
             }
         }
 
-        function escapeHtml(text) {
+        function updateGame(index, field, value) {
+            currentData.games[index][field] = value;
+        }
+
+        // ================= SCHEDULE =================
+        function renderScheduleList() {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = "";
+            currentData.schedule.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.style.borderBottom = "1px solid #eee";
+                div.style.paddingBottom = "15px";
+                div.innerHTML = `
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" placeholder="日付" value="${escapeAttr(item.date)}" style="width:150px;" onchange="updateSchedule(${index}, 'date', this.value)">
+                        <input type="text" placeholder="イベント内容" value="${escapeAttr(item.event)}" style="flex:1;" onchange="updateSchedule(${index}, 'event', this.value)">
+                        <button onclick="removeSchedule(${index})" style="background:#ccc; border:none; width:40px; cursor:pointer;">×</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addSchedule() {
+            currentData.schedule.push({ date: "", event: "" });
+            renderScheduleList();
+        }
+
+        function removeSchedule(index) {
+            currentData.schedule.splice(index, 1);
+            renderScheduleList();
+        }
+
+        function updateSchedule(index, field, value) {
+            currentData.schedule[index][field] = value;
+        }
+
+
+        // ================= GENERATE =================
+        function generateDataFile() {
+            saveCurrentInputsToMemory();
+
+            const jsonStr = JSON.stringify(currentData, null, 4);
+            // JSファイル形式にする
+            const fileContent = `/* ============================================================
+   ホームページのデータファイル
+   ============================================================ */
+
+const portfolioData = ${jsonStr};
+`;
+
+            document.getElementById('view-profile').style.display = 'none';
+            document.getElementById('view-games').style.display = 'none';
+            document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-output').style.display = 'block'; // Show output
+
+            document.getElementById('output-box').innerText = fileContent;
+
+            // Scroll to output
+            document.getElementById('view-output').scrollIntoView();
+        }
+
+        function escapeAttr(text) {
             if (!text) return "";
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function nl2br(text) {
-            return escapeHtml(text).replace(/\n/g, "<br>\n");
-        }
-
-        function showOutput(code, targetFile, place) {
-            const out = document.getElementById('output-box');
-            out.innerText = code;
-            document.getElementById('output-section').style.display = 'block';
-
-            document.getElementById('instruction-target').innerText = targetFile;
-            document.getElementById('instruction-place').innerText = place;
-
-            // スクロールして結果を見せる
-            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function generateGameDetail() {
-            const title = document.getElementById('game-title').value;
-            const img = document.getElementById('game-image').value;
-            const desc = document.getElementById('game-desc').value;
-
-            let imgTag = '<div class="game-detail-image">\n    <span>画像なし</span>\n</div>';
-            if (img.trim() !== "") {
-                imgTag = `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" class="game-detail-image">`;
-            }
-
-            const code = `<!-- ${escapeHtml(title)} の詳細 -->
-<article class="game-detail">
-    <header class="game-detail-header">
-        <h2 class="game-detail-title">${escapeHtml(title)}</h2>
-    </header>
-
-    ${imgTag}
-
-    <div class="game-detail-body">
-        <p>
-${nl2br(desc)}
-        </p>
-    </div>
-
-    <a href="index.html" class="back-link">← トップに戻る</a>
-</article>`;
-
-            showOutput(code, "作成したHTMLファイル (例: game01.html)", "<main> タグの内側");
-        }
-
-        function generateLink() {
-            const title = document.getElementById('link-title').value;
-            const file = document.getElementById('link-file').value;
-
-            const code = `<li class="game-link-item">
-    <a href="${escapeHtml(file)}" class="game-link">
-        <span class="arrow">▶</span> ${escapeHtml(title)}
-    </a>
-</li>`;
-            showOutput(code, "index.html", "<ul class=\"game-link-list\"> の中");
-        }
-
-        function generateProfile() {
-            const name = document.getElementById('prof-name').value;
-            const bio = document.getElementById('prof-bio').value;
-
-            const code = `<div class="profile-text">
-    <!-- 名前 -->
-    <p class="name">${escapeHtml(name)}</p>
-    <!-- 自己紹介文 -->
-    <p class="bio">
-${nl2br(bio)}
-    </p>
-</div>`;
-            showOutput(code, "index.html", "<div class=\"profile-text\"> の中 (上書き)");
-        }
-
-        function generateSchedule() {
-            const date = document.getElementById('sched-date').value;
-            const evt = document.getElementById('sched-event').value;
-
-            const code = `<div class="schedule-item">
-    <div class="date">${escapeHtml(date)}</div>
-    <div class="event">${escapeHtml(evt)}</div>
-</div>`;
-            showOutput(code, "index.html", "<div class=\"schedule-list\"> の中");
+            return text.replace(/"/g, "&quot;");
         }
 
         function copyToClipboard() {
             const text = document.getElementById('output-box').innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert('コピーしました！\n対象のファイルに貼り付けてください。');
+                alert('コピーしました！ data.js に上書き保存してください。');
             });
         }
     </script>
-
 </body>
 
 </html>
+```

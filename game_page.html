@@ -70,28 +70,27 @@
     </header>
 
     <main class="container">
-        <article class="game-detail">
+        <!-- Javascriptでコンテンツを注入する空のコンテナ -->
+        <article class="game-detail" id="game-detail-display" style="display:none;">
             <header class="game-detail-header">
-                <h2 class="game-detail-title">ゲームタイトル</h2>
+                <h2 class="game-detail-title" id="d-title"></h2>
             </header>
 
-            <!-- 画像エリア -->
-            <!-- <img src="images/game01.jpg" alt="ゲーム画像" class="game-detail-image"> のように書き換えます -->
-            <div class="game-detail-image">
-                <span>ここにゲームの画像が入ります</span>
-            </div>
+            <div id="d-image-area"></div>
 
             <div class="game-detail-body">
-                <p>
-                    ここにゲームの紹介文が入ります。<br>
-                    このページはテンプレートです。新しいゲーム紹介ページを作るときは、このファイルをコピーしてファイル名を変え（例: game02.html）、
-                    中身を書き換えてください。<br><br>
-                    エディタツールを使うと、ここの文章を作成することができます。
-                </p>
+                <p id="d-description"></p>
             </div>
 
             <a href="index.html" class="back-link">← トップに戻る</a>
         </article>
+
+        <!-- エラーメッセージ用 -->
+        <div id="error-message" style="display:none; padding:40px; text-align:center;">
+            <h2>ページが見つかりません</h2>
+            <p>指定されたゲームIDが存在しないか、間違っています。</p>
+            <a href="index.html" class="back-link">トップに戻る</a>
+        </div>
     </main>
 
     <footer class="site-footer">
@@ -99,6 +98,53 @@
             <p>&copy; 2023 KonDo Portfolio</p>
         </div>
     </footer>
+
+    <!-- データとスクリプト -->
+    <script src="data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // URLパラメータから ?id=xxx を取得
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameId = urlParams.get('id');
+
+            if (!gameId || typeof portfolioData === 'undefined') {
+                showError();
+                return;
+            }
+
+            // data.js の games 配列から該当するIDを探す
+            const game = portfolioData.games.find(g => g.id === gameId);
+
+            if (!game) {
+                showError();
+                return;
+            }
+
+            // データを画面に反映
+            document.getElementById('d-title').innerText = game.title;
+            document.getElementById('d-description').innerHTML = game.description.replace(/\n/g, '<br>');
+
+            // 画像の処理
+            const imgArea = document.getElementById('d-image-area');
+            if (game.image && game.image.trim() !== "") {
+                imgArea.innerHTML = `<img src="${escapeHtml(game.image)}" alt="${escapeHtml(game.title)}" class="game-detail-image">`;
+            } else {
+                imgArea.innerHTML = `<div class="game-detail-image"><span>画像なし</span></div>`;
+            }
+
+            // 表示オン
+            document.getElementById('game-detail-display').style.display = 'block';
+        });
+
+        function showError() {
+            document.getElementById('error-message').style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text.replace(/"/g, "&quot;");
+        }
+    </script>
 
 </body>
 
