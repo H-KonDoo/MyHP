@@ -71,7 +71,8 @@
     <!-- フッター -->
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2023 KonDo Portfolio</p>
+            <p>&copy; 2023 KonDo Portfolio <span id="site-version"
+                    style="font-size:0.8rem; margin-left:10px; opacity:0.7;"></span></p>
         </div>
     </footer>
 
@@ -83,6 +84,12 @@
             if (typeof portfolioData === 'undefined') {
                 console.error("data.js が正しく読み込まれていません。");
                 return;
+            }
+
+            // 0. バージョンの表示
+            const verElem = document.getElementById('site-version');
+            if (verElem && portfolioData.version) {
+                verElem.innerText = "Ver " + portfolioData.version;
             }
 
             // 1. プロフィールの表示

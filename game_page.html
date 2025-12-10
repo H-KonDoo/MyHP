@@ -95,7 +95,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2023 KonDo Portfolio</p>
+            <p>&copy; 2023 KonDo Portfolio <span id="site-version"
+                    style="font-size:0.8rem; margin-left:10px; opacity:0.7;"></span></p>
         </div>
     </footer>
 
@@ -123,6 +124,11 @@
             // データを画面に反映
             document.getElementById('d-title').innerText = game.title;
             document.getElementById('d-description').innerHTML = game.description.replace(/\n/g, '<br>');
+
+            // バージョン表示
+            if (document.getElementById('site-version') && portfolioData.version) {
+                document.getElementById('site-version').innerText = "Ver " + portfolioData.version;
+            }
 
             // 画像の処理
             const imgArea = document.getElementById('d-image-area');

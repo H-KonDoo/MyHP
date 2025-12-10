@@ -224,6 +224,11 @@
              ============================================== -->
         <div id="view-profile">
             <h3>プロフィール編集</h3>
+            <div class="form-group" style="background:#fff3e0; padding:10px; border-radius:6px; margin-bottom:20px;">
+                <label>バージョン番号 (画面右下に表示)</label>
+                <input type="text" id="prof-version" placeholder="1.0" style="width:100px;">
+            </div>
+
             <div class="form-group">
                 <label>名前</label>
                 <input type="text" id="prof-name">
@@ -279,6 +284,7 @@
     <script>
         // 作業用変数
         let currentData = {
+            version: "1.0",
             profile: { name: "", bio: "" },
             games: [],
             schedule: []
@@ -289,6 +295,9 @@
             if (typeof portfolioData !== 'undefined') {
                 // ディープコピーで読み込み
                 currentData = JSON.parse(JSON.stringify(portfolioData));
+                // 既存データにversionがない場合のフォールバック
+                if (!currentData.version) currentData.version = "1.0";
+
                 initForms();
             } else {
                 alert("data.js が見つかりませんでした。新規作成モードで開始します。");
@@ -296,6 +305,12 @@
         });
 
         function initForms() {
+            // バージョン
+            const savedVer = currentData.version || "1.0";
+            // バージョン入力欄があればセットする（動的に追加するか、HTMLに追加する必要あり）
+            // UI上の場所を探す -> プロフィール欄に追加するのが自然
+            document.getElementById('prof-version').value = savedVer;
+
             // プロフィール
             document.getElementById('prof-name').value = currentData.profile.name;
             document.getElementById('prof-bio').value = currentData.profile.bio.replace(/<br>/g, "\n");
@@ -332,9 +347,14 @@
         }
 
         function saveCurrentInputsToMemory() {
-            // Profile
-            currentData.profile.name = document.getElementById('prof-name').value;
-            currentData.profile.bio = document.getElementById('prof-bio').value.replace(/\n/g, "<br>");
+            // Profile & Version
+            if (document.getElementById('prof-version')) {
+                currentData.version = document.getElementById('prof-version').value;
+            }
+            if (document.getElementById('prof-name')) {
+                currentData.profile.name = document.getElementById('prof-name').value;
+                currentData.profile.bio = document.getElementById('prof-bio').value.replace(/\n/g, "<br>");
+            }
 
             // Games & Schedule are updated live via inputs, no global save needed for lists specifically
             // because input onchange events handle them.
@@ -362,7 +382,10 @@
                     <input type="text" value="${escapeAttr(game.id)}" onchange="updateGame(${index}, 'id', this.value)">
 
                     <label style="margin-top:10px;">画像ファイル名</label>
-                    <input type="text" value="${escapeAttr(game.image)}" onchange="updateGame(${index}, 'image', this.value)">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="game-image-${index}" value="${escapeAttr(game.image)}" onchange="updateGame(${index}, 'image', this.value)" style="flex:1;">
+                        <input type="file" accept="image/*" onchange="pickGameImage(${index}, this)" style="width:auto;">
+                    </div>
                     
                     <label style="margin-top:10px;">紹介文</label>
                     <textarea onchange="updateGame(${index}, 'description', this.value)" style="height:100px;">${game.description}</textarea>
@@ -391,6 +414,17 @@
 
         function updateGame(index, field, value) {
             currentData.games[index][field] = value;
+        }
+
+        function pickGameImage(index, input) {
+            if (input.files && input.files.length > 0) {
+                const fileName = input.files[0].name;
+                // Update data
+                updateGame(index, 'image', fileName);
+                // Update text input view
+                const textInput = document.getElementById(`game-image-${index}`);
+                if (textInput) textInput.value = fileName;
+            }
         }
 
         // ================= SCHEDULE =================
