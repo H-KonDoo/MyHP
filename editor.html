@@ -213,7 +213,9 @@
     <div class="tabs">
         <div class="tab active" onclick="switchTab('profile')">1. 経歴 (プロフィール)</div>
         <div class="tab" onclick="switchTab('games')">2. ゲームリスト</div>
-        <div class="tab" onclick="switchTab('schedule')">3. スケジュール</div>
+        <div class="tab" onclick="switchTab('creations')">3. 創作物リスト</div>
+        <div class="tab" onclick="switchTab('schedule')">4. スケジュール</div>
+        <div class="tab" onclick="switchTab('secrets')">5. 私的なこと</div>
         <div class="tab" style="background:#4CAF50; color:white;" onclick="generateDataFile()">★ 保存用データ作成</div>
     </div>
 
@@ -249,7 +251,17 @@
         </div>
 
         <!-- ==============================================
-             3. スケジュール編集
+             3. 創作物リスト編集
+             ============================================== -->
+        <div id="view-creations" style="display:none;">
+            <h3>創作物リスト編集</h3>
+            <div id="creations-container"></div>
+            <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addCreation()">＋
+                創作物を追加する</button>
+        </div>
+
+        <!-- ==============================================
+             4. スケジュール編集
              ============================================== -->
         <div id="view-schedule" style="display:none;">
             <h3>スケジュール編集</h3>
@@ -259,7 +271,17 @@
         </div>
 
         <!-- ==============================================
-             4. データ出力 (保存)
+             5. 私的なことリスト編集
+             ============================================== -->
+        <div id="view-secrets" style="display:none;">
+            <h3>私的なことリスト編集</h3>
+            <div id="secrets-container"></div>
+            <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addSecret()">＋
+                私的なことを追加する</button>
+        </div>
+
+        <!-- ==============================================
+             6. データ出力 (保存)
              ============================================== -->
         <div id="view-output" style="display:none;">
             <div class="instruction-box">
@@ -287,6 +309,8 @@
             version: "1.0",
             profile: { name: "", bio: "" },
             games: [],
+            creations: [],
+            secrets: [],
             schedule: []
         };
 
@@ -297,6 +321,10 @@
                 currentData = JSON.parse(JSON.stringify(portfolioData));
                 // 既存データにversionがない場合のフォールバック
                 if (!currentData.version) currentData.version = "1.0";
+                // 既存データにcreationsがない場合のフォールバック
+                if (!currentData.creations) currentData.creations = [];
+                // 既存データにsecretsがない場合のフォールバック
+                if (!currentData.secrets) currentData.secrets = [];
 
                 initForms();
             } else {
@@ -307,8 +335,6 @@
         function initForms() {
             // バージョン
             const savedVer = currentData.version || "1.0";
-            // バージョン入力欄があればセットする（動的に追加するか、HTMLに追加する必要あり）
-            // UI上の場所を探す -> プロフィール欄に追加するのが自然
             document.getElementById('prof-version').value = savedVer;
 
             // プロフィール
@@ -318,18 +344,25 @@
             // ゲーム
             renderGamesList();
 
+            // 創作物
+            renderCreationsList();
+
             // スケジュール
             renderScheduleList();
+
+            // 私的なこと
+            renderSecretsList();
         }
 
         function switchTab(mode) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            // Save current inputs to memory before switching
             saveCurrentInputsToMemory();
 
             document.getElementById('view-profile').style.display = 'none';
             document.getElementById('view-games').style.display = 'none';
+            document.getElementById('view-creations').style.display = 'none';
             document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-secrets').style.display = 'none';
             document.getElementById('view-output').style.display = 'none';
 
             if (mode === 'profile') {
@@ -340,8 +373,16 @@
                 document.getElementById('view-games').style.display = 'block';
                 event.target.classList.add('active');
             }
+            if (mode === 'creations') {
+                document.getElementById('view-creations').style.display = 'block';
+                event.target.classList.add('active');
+            }
             if (mode === 'schedule') {
                 document.getElementById('view-schedule').style.display = 'block';
+                event.target.classList.add('active');
+            }
+            if (mode === 'secrets') {
+                document.getElementById('view-secrets').style.display = 'block';
                 event.target.classList.add('active');
             }
         }
@@ -355,8 +396,7 @@
                 currentData.profile.name = document.getElementById('prof-name').value;
                 currentData.profile.bio = document.getElementById('prof-bio').value.replace(/\n/g, "<br>");
             }
-
-            // Games & Schedule are updated live via inputs, no global save needed for lists specifically
+            // Games, Creations, Secrets, Schedule are updated live via inputs, no global save needed for lists specifically
             // because input onchange events handle them.
         }
 
@@ -370,11 +410,39 @@
                 div.style.border = "1px solid #ddd";
                 div.style.padding = "15px";
                 div.style.marginBottom = "20px";
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <strong>ゲーム #${index + 1} (ID: ${game.id})</strong>
-                        <button onclick="removeGame(${index})" style="background:#d32f2f; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">削除</button>
-                    </div>
+
+                // Header with Delete Button
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = "flex";
+                headerDiv.style.justifyContent = "space-between";
+                headerDiv.style.marginBottom = "10px";
+
+                const titleStrong = document.createElement('strong');
+                titleStrong.innerText = `ゲーム #${index + 1} (ID: ${game.id})`;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = "button";
+                deleteBtn.innerText = "削除";
+                deleteBtn.style.background = "#d32f2f";
+                deleteBtn.style.color = "white";
+                deleteBtn.style.border = "none";
+                deleteBtn.style.padding = "5px 10px";
+                deleteBtn.style.borderRadius = "4px";
+                deleteBtn.style.cursor = "pointer";
+
+                // Directly attach event listener
+                deleteBtn.onclick = function () {
+                    removeGame(index);
+                };
+
+                headerDiv.appendChild(titleStrong);
+                headerDiv.appendChild(deleteBtn);
+                div.appendChild(headerDiv);
+
+                // Inputs (using template literal for brevity, but could also be DOM elements)
+                // Note: We use a wrapper for the rest to keep it simple
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
                     <label>タイトル</label>
                     <input type="text" value="${escapeAttr(game.title)}" onchange="updateGame(${index}, 'title', this.value)">
                     
@@ -390,6 +458,8 @@
                     <label style="margin-top:10px;">紹介文</label>
                     <textarea onchange="updateGame(${index}, 'description', this.value)" style="height:100px;">${game.description}</textarea>
                 `;
+                div.appendChild(contentDiv);
+
                 container.appendChild(div);
             });
         }
@@ -406,9 +476,16 @@
         }
 
         function removeGame(index) {
+            console.log("Attempting to remove game at index:", index);
             if (confirm("このゲームを削除してもよろしいですか？")) {
-                currentData.games.splice(index, 1);
-                renderGamesList();
+                try {
+                    currentData.games.splice(index, 1);
+                    renderGamesList();
+                    console.log("Game removed successfully");
+                } catch (e) {
+                    console.error("Error removing game:", e);
+                    alert("削除中にエラーが発生しました。");
+                }
             }
         }
 
@@ -426,6 +503,196 @@
                 if (textInput) textInput.value = fileName;
             }
         }
+
+        // ================= CREATIONS =================
+        function renderCreationsList() {
+            const container = document.getElementById('creations-container');
+            container.innerHTML = "";
+            currentData.creations.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.style.border = "1px solid #ddd";
+                div.style.padding = "15px";
+                div.style.marginBottom = "20px";
+
+                // Header with Delete Button
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = "flex";
+                headerDiv.style.justifyContent = "space-between";
+                headerDiv.style.marginBottom = "10px";
+
+                const titleStrong = document.createElement('strong');
+                titleStrong.innerText = `創作物 #${index + 1} (ID: ${item.id})`;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = "button";
+                deleteBtn.innerText = "削除";
+                deleteBtn.style.background = "#d32f2f";
+                deleteBtn.style.color = "white";
+                deleteBtn.style.border = "none";
+                deleteBtn.style.padding = "5px 10px";
+                deleteBtn.style.borderRadius = "4px";
+                deleteBtn.style.cursor = "pointer";
+
+                deleteBtn.onclick = function () {
+                    removeCreation(index);
+                };
+
+                headerDiv.appendChild(titleStrong);
+                headerDiv.appendChild(deleteBtn);
+                div.appendChild(headerDiv);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
+                    <label>タイトル</label>
+                    <input type="text" value="${escapeAttr(item.title)}" onchange="updateCreation(${index}, 'title', this.value)">
+                    
+                    <label style="margin-top:10px;">ID (英数字推奨)</label>
+                    <input type="text" value="${escapeAttr(item.id)}" onchange="updateCreation(${index}, 'id', this.value)">
+
+                    <label style="margin-top:10px;">画像ファイル名</label>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="creation-image-${index}" value="${escapeAttr(item.image)}" onchange="updateCreation(${index}, 'image', this.value)" style="flex:1;">
+                        <input type="file" accept="image/*" onchange="pickCreationImage(${index}, this)" style="width:auto;">
+                    </div>
+                    
+                    <label style="margin-top:10px;">紹介文</label>
+                    <textarea onchange="updateCreation(${index}, 'description', this.value)" style="height:100px;">${item.description}</textarea>
+                `;
+                div.appendChild(contentDiv);
+                container.appendChild(div);
+            });
+        }
+
+        function addCreation() {
+            const newId = "creation" + (new Date().getTime());
+            currentData.creations.push({
+                id: newId,
+                title: "新規創作物",
+                image: "",
+                description: "紹介文を入力"
+            });
+            renderCreationsList();
+        }
+
+        function removeCreation(index) {
+            console.log("Attempting to remove creation at index:", index);
+            if (confirm("この創作物を削除してもよろしいですか？")) {
+                try {
+                    currentData.creations.splice(index, 1);
+                    renderCreationsList();
+                    console.log("Creation removed successfully");
+                } catch (e) {
+                    console.error(e);
+                    alert("エラーが発生しました。");
+                }
+            }
+        }
+
+        function updateCreation(index, field, value) {
+            currentData.creations[index][field] = value;
+        }
+
+        function pickCreationImage(index, input) {
+            if (input.files && input.files.length > 0) {
+                const fileName = input.files[0].name;
+                updateCreation(index, 'image', fileName);
+                const textInput = document.getElementById(`creation-image-${index}`);
+                if (textInput) textInput.value = fileName;
+            }
+        }
+
+        // ================= SECRETS =================
+        function renderSecretsList() {
+            const container = document.getElementById('secrets-container');
+            container.innerHTML = "";
+            currentData.secrets.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.style.border = "1px solid #ddd";
+                div.style.padding = "15px";
+                div.style.marginBottom = "20px";
+
+                // Header with Delete Button
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = "flex";
+                headerDiv.style.justifyContent = "space-between";
+                headerDiv.style.marginBottom = "10px";
+
+                const titleStrong = document.createElement('strong');
+                titleStrong.innerText = `私的なこと #${index + 1} (ID: ${item.id})`;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = "button";
+                deleteBtn.innerText = "削除";
+                deleteBtn.style.background = "#d32f2f";
+                deleteBtn.style.color = "white";
+                deleteBtn.style.border = "none";
+                deleteBtn.style.padding = "5px 10px";
+                deleteBtn.style.borderRadius = "4px";
+                deleteBtn.style.cursor = "pointer";
+
+                deleteBtn.onclick = function () {
+                    removeSecret(index);
+                };
+
+                headerDiv.appendChild(titleStrong);
+                headerDiv.appendChild(deleteBtn);
+                div.appendChild(headerDiv);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
+                    <label>タイトル</label>
+                    <input type="text" value="${escapeAttr(item.title)}" onchange="updateSecret(${index}, 'title', this.value)">
+                    
+                    <label style="margin-top:10px;">ID (英数字推奨)</label>
+                    <input type="text" value="${escapeAttr(item.id)}" onchange="updateSecret(${index}, 'id', this.value)">
+
+                    <label style="margin-top:10px;">画像ファイル名</label>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="secret-image-${index}" value="${escapeAttr(item.image)}" onchange="updateSecret(${index}, 'image', this.value)" style="flex:1;">
+                        <input type="file" accept="image/*" onchange="pickSecretImage(${index}, this)" style="width:auto;">
+                    </div>
+                    
+                    <label style="margin-top:10px;">紹介文</label>
+                    <textarea onchange="updateSecret(${index}, 'description', this.value)" style="height:100px;">${item.description}</textarea>
+                `;
+                div.appendChild(contentDiv);
+                container.appendChild(div);
+            });
+        }
+
+        function addSecret() {
+            const newId = "secret" + (new Date().getTime());
+            currentData.secrets.push({
+                id: newId,
+                title: "新規の私的なこと",
+                image: "",
+                description: "内容を入力"
+            });
+            renderSecretsList();
+        }
+
+        function removeSecret(index) {
+            if (confirm("この項目を削除してもよろしいですか？")) {
+                currentData.secrets.splice(index, 1);
+                renderSecretsList();
+            }
+        }
+
+        function updateSecret(index, field, value) {
+            currentData.secrets[index][field] = value;
+        }
+
+        function pickSecretImage(index, input) {
+            if (input.files && input.files.length > 0) {
+                const fileName = input.files[0].name;
+                updateSecret(index, 'image', fileName);
+                const textInput = document.getElementById(`secret-image-${index}`);
+                if (textInput) textInput.value = fileName;
+            }
+        }
+
 
         // ================= SCHEDULE =================
         function renderScheduleList() {
@@ -477,7 +744,9 @@ const portfolioData = ${jsonStr};
 
             document.getElementById('view-profile').style.display = 'none';
             document.getElementById('view-games').style.display = 'none';
+            document.getElementById('view-creations').style.display = 'none';
             document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-secrets').style.display = 'none';
             document.getElementById('view-output').style.display = 'block'; // Show output
 
             document.getElementById('output-box').innerText = fileContent;

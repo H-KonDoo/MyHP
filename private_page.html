@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 検索エンジンに表示させない設定 -->
     <meta name="robots" content="noindex, nofollow">
-    <title>ゲーム詳細 - KonDoの紹介ページ</title>
+    <title>詳細 - KonDo</title>
     <link rel="stylesheet" href="styles.css">
     <!-- フォントの読み込み（Noto Sans JP） -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,13 +58,11 @@
     <!-- ヘッダー -->
     <header class="site-header">
         <div class="container">
-            <h1 class="site-title"><a href="hidden.html" style="color: inherit;">KonDoの紹介ページ</a></h1>
+            <h1 class="site-title"><a href="hidden.html" style="color: inherit;">もっと私的なこと</a></h1>
             <nav class="site-nav">
                 <ul>
-                    <li><a href="index.html#profile">経歴</a></li>
-                    <li><a href="index.html#games">ゲーム紹介</a></li>
-                    <li><a href="index.html#creations">創作物</a></li>
-                    <li><a href="index.html#schedule">予定</a></li>
+                    <li><a href="hidden.html">一覧に戻る</a></li>
+                    <li><a href="index.html">トップへ戻る</a></li>
                 </ul>
             </nav>
         </div>
@@ -83,14 +81,14 @@
                 <p id="d-description"></p>
             </div>
 
-            <a href="index.html" class="back-link">← トップに戻る</a>
+            <a href="hidden.html" class="back-link">← リストに戻る</a>
         </article>
 
         <!-- エラーメッセージ用 -->
         <div id="error-message" style="display:none; padding:40px; text-align:center;">
             <h2>ページが見つかりません</h2>
-            <p>指定されたゲームIDが存在しないか、間違っています。</p>
-            <a href="index.html" class="back-link">トップに戻る</a>
+            <p>指定されたIDが存在しないか、間違っています。</p>
+            <a href="hidden.html" class="back-link">リストに戻る</a>
         </div>
     </main>
 
@@ -107,24 +105,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             // URLパラメータから ?id=xxx を取得
             const urlParams = new URLSearchParams(window.location.search);
-            const gameId = urlParams.get('id');
+            const itemId = urlParams.get('id');
 
-            if (!gameId || typeof portfolioData === 'undefined') {
+            if (!itemId || typeof portfolioData === 'undefined') {
                 showError();
                 return;
             }
 
-            // data.js の games 配列から該当するIDを探す
-            const game = portfolioData.games.find(g => g.id === gameId);
+            // data.js の secrets 配列から該当するIDを探す
+            // フォールバック: secretsがない場合は空配列
+            const items = portfolioData.secrets || [];
+            const item = items.find(g => g.id === itemId);
 
-            if (!game) {
+            if (!item) {
                 showError();
                 return;
             }
 
             // データを画面に反映
-            document.getElementById('d-title').innerText = game.title;
-            document.getElementById('d-description').innerHTML = game.description.replace(/\n/g, '<br>');
+            document.getElementById('d-title').innerText = item.title;
+            document.getElementById('d-description').innerHTML = item.description.replace(/\n/g, '<br>');
 
             // バージョン表示
             if (document.getElementById('site-version') && portfolioData.version) {
@@ -133,8 +133,8 @@
 
             // 画像の処理
             const imgArea = document.getElementById('d-image-area');
-            if (game.image && game.image.trim() !== "") {
-                imgArea.innerHTML = `<img src="${escapeHtml(game.image)}" alt="${escapeHtml(game.title)}" class="game-detail-image">`;
+            if (item.image && item.image.trim() !== "") {
+                imgArea.innerHTML = `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" class="game-detail-image">`;
             } else {
                 imgArea.innerHTML = `<div class="game-detail-image"><span>画像なし</span></div>`;
             }

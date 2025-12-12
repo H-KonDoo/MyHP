@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 検索エンジンに表示させない設定 -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>もっと私的なこと - KonDo</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- フォントの読み込み（Noto Sans JP） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ヘッダー -->
+    <header class="site-header">
+        <div class="container">
+            <!-- サイトのタイトル（トップに戻る） -->
+            <h1 class="site-title"><a href="index.html" style="color: inherit;">もっと私的なこと</a></h1>
+
+            <p style="color: #aaa; text-align: center; margin-bottom: 20px;">
+                ここは秘密のページです。
+            </p>
+
+            <!-- ナビゲーションメニュー -->
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="index.html">トップへ戻る</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- コンテンツセクション -->
+        <section id="secrets" class="content-section">
+            <h2 class="section-title">私的なこと、あれこれ</h2>
+            <p class="section-description">個人的な趣味や、あまり公にしていない活動の記録です。</p>
+
+            <!-- Javascriptでデータを注入するリスト -->
+            <ul class="game-link-list" id="secrets-list-display">
+                <!-- ここにリストアイテムが入る -->
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 KonDo Project <span id="site-version"
+                    style="font-size:0.8rem; margin-left:10px; opacity:0.7;"></span></p>
+        </div>
+    </footer>
+
+    <!-- データとスクリプト -->
+    <script src="data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // バージョン表示
+            if (typeof portfolioData !== 'undefined' && portfolioData.version) {
+                const vSpan = document.getElementById('site-version');
+                if (vSpan) vSpan.innerText = "Ver " + portfolioData.version;
+            }
+
+            // Secretsリストのレンダリング
+            if (typeof portfolioData !== 'undefined' && portfolioData.secrets) {
+                const secretsList = document.getElementById('secrets-list-display');
+                let secretsHtml = '';
+
+                portfolioData.secrets.forEach(item => {
+                    secretsHtml += `
+                        <li class="game-link-item">
+                            <a href="private_page.html?id=${item.id}" class="game-link">
+                                <span class="arrow">▶</span> ${escapeHtml(item.title)}
+                            </a>
+                        </li>
+                    `;
+                });
+
+                secretsList.innerHTML = secretsHtml;
+            } else {
+                document.getElementById('secrets-list-display').innerHTML = '<li class="game-link-item">データがありません。</li>';
+            }
+        });
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text.replace(/[&<>"']/g, function (match) {
+                const escape = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                };
+                return escape[match];
+            });
+        }
+    </script>
+
+</body>
+
+</html>

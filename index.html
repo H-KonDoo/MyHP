@@ -20,17 +20,21 @@
     <header class="site-header">
         <div class="container">
             <!-- サイトのタイトル -->
-            <h1 class="site-title">KonDoの紹介ページ</h1>
-            <!-- ナビゲーションメニュー -->
-            <nav class="site-nav">
-                <ul>
-                    <li><a href="#profile">経歴</a></li>
-                    <li><a href="#games">ゲーム紹介</a></li>
-                    <li><a href="#schedule">予定</a></li>
-                </ul>
-            </nav>
+            <h1 class="site-title"><a href="hidden.html" style="color: inherit;">KonDoの紹介ページ</a></h1>
         </div>
     </header>
+
+    <!-- ナビゲーションメニュー (ヘッダーの下に配置) -->
+    <div class="container" style="text-align: center; margin-bottom: 60px;">
+        <nav class="site-nav">
+            <ul>
+                <li><a href="#profile">経歴</a></li>
+                <li><a href="#games">ゲーム紹介</a></li>
+                <li><a href="#creations">創作物</a></li>
+                <li><a href="#schedule">予定</a></li>
+            </ul>
+        </nav>
+    </div>
 
     <main class="container">
         <!-- ==========================================
@@ -58,20 +62,37 @@
         </section>
 
         <!-- ==========================================
-             3. 予定 (スケジュール) セクション
+             3. Creations (創作物) セクション
+             ========================================== -->
+        <section id="creations" class="content-section">
+            <h2 class="section-title">Creations (創作物)</h2>
+            <p class="section-description">自身で作った創作物など。</p>
+
+            <ul class="game-link-list" id="creations-list-display">
+                <!-- ここに data.js の内容が表示されます -->
+            </ul>
+        </section>
+
+        <!-- ==========================================
+             4. 予定 (スケジュール) セクション
              ========================================== -->
         <section id="schedule" class="content-section">
             <h2 class="section-title">Schedule (予定)</h2>
-            <div class="schedule-list" id="schedule-display">
+            <div class="schedule-list" id="schedule-list-display">
                 <!-- ここに data.js の内容が表示されます -->
             </div>
         </section>
+
+        <!-- トップへ戻るボタン -->
+        <div style="text-align: center; margin-top: 60px; margin-bottom: 20px;">
+            <a href="#" class="back-to-top-btn">▲ PAGE TOP</a>
+        </div>
     </main>
 
     <!-- フッター -->
     <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2023 KonDo Portfolio <span id="site-version"
+            <p>&copy; 2025 KonDo Project <span id="site-version"
                     style="font-size:0.8rem; margin-left:10px; opacity:0.7;"></span></p>
         </div>
     </footer>
@@ -99,22 +120,87 @@
                 <p class="bio">${portfolioData.profile.bio}</p>
             `;
 
-            // 2. ゲームリストの表示
-            const gamesList = document.getElementById('games-list-display');
-            let gamesHtml = '';
-            portfolioData.games.forEach(game => {
-                gamesHtml += `
-                    <li class="game-link-item">
-                        <a href="game_page.html?id=${game.id}" class="game-link">
-                            <span class="arrow">▶</span> ${escapeHtml(game.title)}
-                        </a>
-                    </li>
-                `;
-            });
-            gamesList.innerHTML = gamesHtml;
+            // リスト描画用の汎用関数 (ページネーション対応)
+            function renderPaginatedList(dataList, containerId, itemsPerPage, currentPage = 1) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
 
-            // 3. スケジュールの表示
-            const scheduleArea = document.getElementById('schedule-display');
+                // 外部のナビゲーションエリアがあれば削除 (古い実装の残骸)
+                const oldNav = document.getElementById(containerId + "-nav");
+                if (oldNav) oldNav.remove();
+
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const pageItems = dataList.slice(startIndex, endIndex);
+
+                let html = "";
+                pageItems.forEach(item => {
+                    // IDによるリンク先判定 (GameかCreationかで適宜変える必要があるが、今回は共通クラスで処理)
+                    // GameとCreationで構造が同じなので、呼び出し元でURLのプレフィックスを渡す設計にするのが綺麗だが、
+                    // 既存のデータ構造に合わせて簡易分岐する
+                    let linkUrl = "#";
+                    // IDのプレフィックスやデータ構造から判定（簡易的）
+                    if (containerId.includes("games")) {
+                        linkUrl = `game_page.html?id=${item.id}`;
+                    } else {
+                        linkUrl = `creation_page.html?id=${item.id}`;
+                    }
+
+                    html += `
+                        <li class="game-link-item">
+                            <a href="${linkUrl}" class="game-link">
+                                <span class="arrow">▶</span> ${escapeHtml(item.title)}
+                            </a>
+                        </li>
+                    `;
+                });
+
+                // ページネーションコントロール（PREV / NEXT）をリスト内に配置
+                // リストの最後の要素(li)として追加する (タッチパネル風)
+                if (dataList.length > itemsPerPage) {
+                    // margin-top: 10px; でリストの直後に配置 (margin-top: autoだと枠の最下部に行ってしまうため回避)
+                    html += `<li class="pagination-footer" style="padding: 10px; text-align: right; margin-top: 10px; list-style:none;">`;
+
+                    // PREV PAGE ボタン
+                    if (currentPage > 1) {
+                        html += `<button class="pagination-prev-btn-${containerId}" style="background:transparent; color:#0f0; border:1px solid #0f0; padding:5px 15px; margin-right:10px; cursor:pointer; font-family:inherit;">◀ PREV PAGE</button>`;
+                    }
+
+                    // NEXT PAGE ボタン
+                    if (dataList.length > endIndex) {
+                        html += `<button class="pagination-next-btn-${containerId}" style="background:transparent; color:#0f0; border:1px solid #0f0; padding:5px 15px; cursor:pointer; font-family:inherit;">NEXT PAGE ▶</button>`;
+                    }
+
+                    html += `</li>`;
+                }
+
+                container.innerHTML = html;
+
+                // イベントリスナーの設定
+                const prevBtn = container.querySelector(`.pagination-prev-btn-${containerId}`);
+                if (prevBtn) {
+                    prevBtn.onclick = () => {
+                        renderPaginatedList(dataList, containerId, itemsPerPage, currentPage - 1);
+                    };
+                }
+                const nextBtn = container.querySelector(`.pagination-next-btn-${containerId}`);
+                if (nextBtn) {
+                    nextBtn.onclick = () => {
+                        renderPaginatedList(dataList, containerId, itemsPerPage, currentPage + 1);
+                    };
+                }
+            }
+
+            // 2. ゲームリストの表示 (ページネーション: 5件ごと)
+            renderPaginatedList(portfolioData.games, 'games-list-display', 5);
+
+            // 3. 創作物リストの表示 (ページネーション: 5件ごと)
+            if (portfolioData.creations) {
+                renderPaginatedList(portfolioData.creations, 'creations-list-display', 5);
+            }
+
+            // 4. スケジュールの表示
+            const scheduleArea = document.getElementById('schedule-list-display');
             let scheduleHtml = '';
             portfolioData.schedule.forEach(item => {
                 scheduleHtml += `
