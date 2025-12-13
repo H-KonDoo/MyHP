@@ -373,29 +373,8 @@ ul {
 }
 
 /* 3. 予定 (Schedule) - ログ表示風 */
-.schedule-item {
-    display: flex;
-    padding: 15px 10px;
-    border-bottom: 1px solid #222;
-    background-color: #0a0a0a;
-    font-size: 0.95rem;
-}
-
-.schedule-item:hover {
-    background-color: #151515;
-}
-
-.schedule-item .date {
-    width: 150px;
-    color: #0f0;
-    /* ターミナルグリーン */
-    font-weight: bold;
-}
-
-.schedule-item .event {
-    flex: 1;
-    color: #ccc;
-}
+/* 3. 予定 (Schedule) - リスト表示 (共通スタイル .game-link-list を使用するため、個別指定は最小限に) */
+/* 個別の調整が必要な場合のみここに記述 */
 
 /* ==========================================================================
    フッター & バージョン (Footer & Version)
@@ -546,4 +525,27 @@ ul {
     color: #000;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
     transform: translateY(-2px);
+}
+
+/* ページネーション（Next/Prev）ボタン */
+.pagination-btn {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: transparent;
+    color: #0f0;
+    font-weight: bold;
+    border: 1px solid #0f0;
+    text-shadow: 0 0 5px #0f0;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+    transition: all 0.2s;
+    font-family: inherit;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.pagination-btn:hover {
+    background-color: #0f0;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    transform: translateY(-1px);
 }
