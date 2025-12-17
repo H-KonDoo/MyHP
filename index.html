@@ -25,18 +25,16 @@
     </header>
 
     <!-- ナビゲーションメニュー (ヘッダーの下に配置) -->
-    <div class="container" style="text-align: center; margin-bottom: 60px;">
-        <nav class="site-nav">
-            <ul>
-                <li><a href="#profile">経歴</a></li>
-                <li><a href="#games">ゲーム紹介</a></li>
-                <li><a href="#creations">創作物</a></li>
-                <li><a href="#schedule">予定</a></li>
-            </ul>
-        </nav>
-    </div>
+    <nav class="site-nav">
+        <ul>
+            <li><a href="#profile">経歴</a></li>
+            <li><a href="#games">ゲーム紹介</a></li>
+            <li><a href="#creations">創作物</a></li>
+            <li><a href="#schedule">メモ</a></li>
+        </ul>
+    </nav>
 
-    <main class="container">
+    <main class="container" style="margin-top: 60px;">
         <!-- ==========================================
              1. プロフィール (経歴) セクション
              ========================================== -->
@@ -54,7 +52,7 @@
              ========================================== -->
         <section id="games" class="content-section">
             <h2 class="section-title">Games (ゲーム紹介)</h2>
-            <p class="section-description">これまでに作成したゲームの一覧です。タイトルをクリックすると詳細ページへ移動します。</p>
+            <!-- <p class="section-description">これまでに作成したゲームの一覧です。タイトルをクリックすると詳細ページへ移動します。</p> 削除 -->
 
             <ul class="game-link-list" id="games-list-display">
                 <!-- ここに data.js の内容が表示されます -->
@@ -66,7 +64,7 @@
              ========================================== -->
         <section id="creations" class="content-section">
             <h2 class="section-title">Creations (創作物)</h2>
-            <p class="section-description">自身で作った創作物など。</p>
+            <!-- <p class="section-description">自身で作った創作物など。</p> 削除 -->
 
             <ul class="game-link-list" id="creations-list-display">
                 <!-- ここに data.js の内容が表示されます -->
@@ -74,10 +72,10 @@
         </section>
 
         <!-- ==========================================
-             4. 予定 (スケジュール) セクション
+             4. メモ セクション
              ========================================== -->
         <section id="schedule" class="content-section">
-            <h2 class="section-title">Schedule (予定)</h2>
+            <h2 class="section-title">Memo (メモ)</h2>
             <ul class="game-link-list" id="schedule-list-display">
                 <!-- ここに data.js の内容が表示されます -->
             </ul>
@@ -149,7 +147,7 @@
                         }
                     } else if (item.date && item.event) {
                         // Schedule
-                        // 予定はリンクなしで、テキストとして表示するだけ
+                        // メモはリンクなしで、テキストとして表示するだけ
                         // カーソルをdefaultにしてクリック感を出さない、あるいは詳細があればリンクにする
                         // 今回は「紹介と同じデザイン」なので、見た目はリンクっぽいが機能しない形、あるいは単なるリストアイテムにする
                         displayText = `<span class="date" style="color:#ffb000; margin-right:10px;">${escapeHtml(item.date)}</span> ${escapeHtml(item.event)}`;
@@ -168,8 +166,8 @@
                 // ページネーションコントロール（PREV / NEXT）をリスト内に配置
                 // リストの最後の要素(li)として追加する (タッチパネル風)
                 if (dataList.length > itemsPerPage) {
-                    // margin-top: 10px; でリストの直後に配置 (margin-top: autoだと枠の最下部に行ってしまうため回避)
-                    html += `<li class="pagination-footer" style="padding: 10px; text-align: right; margin-top: 10px; list-style:none;">`;
+                    // margin-top: auto; でリストの最下部に配置 (Flexboxの機能を利用)
+                    html += `<li class="pagination-footer" style="padding: 10px; text-align: right; margin-top: auto; list-style:none;">`;
 
                     // PREV PAGE ボタン
                     if (currentPage > 1) {
@@ -209,7 +207,7 @@
                 renderPaginatedList(portfolioData.creations, 'creations-list-display', 5);
             }
 
-            // 4. スケジュールの表示 (ページネーション: 5件ごと)
+            // 4. メモの表示 (ページネーション: 5件ごと)
             if (portfolioData.schedule) {
                 renderPaginatedList(portfolioData.schedule, 'schedule-list-display', 5);
             }

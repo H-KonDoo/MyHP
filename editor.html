@@ -206,7 +206,9 @@
     <h1>KonDo 紹介ページ 管理ツール</h1>
     <p class="intro-text">
         このツールで内容を編集し、最後に「保存用データを作成」ボタンを押してください。<br>
-        作成されたデータで <code>data.js</code> を上書き保存すると、ホームページ全体が更新されます。
+        作成されたデータで <code>data.js</code> を上書き保存すると、ホームページ全体が更新されます。<br>
+        <span style="color:#d32f2f; font-weight:bold;">※ 画像ファイルを使用する場合は、必ずこのツールや <code>index.html</code>
+            と同じフォルダに画像ファイルを置いてください。</span>
     </p>
 
     <!-- タブ切り替え -->
@@ -214,7 +216,7 @@
         <div class="tab active" onclick="switchTab('profile')">1. 経歴 (プロフィール)</div>
         <div class="tab" onclick="switchTab('games')">2. ゲームリスト</div>
         <div class="tab" onclick="switchTab('creations')">3. 創作物リスト</div>
-        <div class="tab" onclick="switchTab('schedule')">4. スケジュール</div>
+        <div class="tab" onclick="switchTab('schedule')">4. メモ</div>
         <div class="tab" onclick="switchTab('secrets')">5. 私的なこと</div>
         <div class="tab" style="background:#4CAF50; color:white;" onclick="generateDataFile()">★ 保存用データ作成</div>
     </div>
@@ -261,13 +263,13 @@
         </div>
 
         <!-- ==============================================
-             4. スケジュール編集
+             4. メモ編集
              ============================================== -->
         <div id="view-schedule" style="display:none;">
-            <h3>スケジュール編集</h3>
+            <h3>メモ編集</h3>
             <div id="schedule-container"></div>
             <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addSchedule()">＋
-                予定を追加する</button>
+                メモを追加する</button>
         </div>
 
         <!-- ==============================================
@@ -347,7 +349,7 @@
             // 創作物
             renderCreationsList();
 
-            // スケジュール
+            // メモ
             renderScheduleList();
 
             // 私的なこと
@@ -430,10 +432,10 @@
                 deleteBtn.style.borderRadius = "4px";
                 deleteBtn.style.cursor = "pointer";
 
-                // Directly attach event listener
-                deleteBtn.onclick = function () {
+                // Attach event listener for delete button
+                deleteBtn.addEventListener('click', function () {
                     removeGame(index);
-                };
+                });
 
                 headerDiv.appendChild(titleStrong);
                 headerDiv.appendChild(deleteBtn);
@@ -454,6 +456,9 @@
                         <input type="text" id="game-image-${index}" value="${escapeAttr(game.image)}" onchange="updateGame(${index}, 'image', this.value)" style="flex:1;">
                         <input type="file" accept="image/*" onchange="pickGameImage(${index}, this)" style="width:auto;">
                     </div>
+                    <div id="game-preview-${index}" style="margin-top:10px;">
+                        ${game.image ? `<img src="${escapeAttr(game.image)}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">` : ''}
+                    </div>
                     
                     <label style="margin-top:10px;">紹介文</label>
                     <textarea onchange="updateGame(${index}, 'description', this.value)" style="height:100px;">${game.description}</textarea>
@@ -466,7 +471,7 @@
 
         function addGame() {
             const newId = "game" + (new Date().getTime());
-            currentData.games.push({
+            currentData.games.unshift({
                 id: newId,
                 title: "新規ゲーム",
                 image: "",
@@ -499,8 +504,18 @@
                 // Update data
                 updateGame(index, 'image', fileName);
                 // Update text input view
-                const textInput = document.getElementById(`game-image-${index}`);
                 if (textInput) textInput.value = fileName;
+
+                // プレビュー表示
+                const previewDiv = document.getElementById(`game-preview-${index}`);
+                if (previewDiv) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
         }
 
@@ -534,9 +549,9 @@
                 deleteBtn.style.borderRadius = "4px";
                 deleteBtn.style.cursor = "pointer";
 
-                deleteBtn.onclick = function () {
+                deleteBtn.addEventListener('click', function () {
                     removeCreation(index);
-                };
+                });
 
                 headerDiv.appendChild(titleStrong);
                 headerDiv.appendChild(deleteBtn);
@@ -555,6 +570,9 @@
                         <input type="text" id="creation-image-${index}" value="${escapeAttr(item.image)}" onchange="updateCreation(${index}, 'image', this.value)" style="flex:1;">
                         <input type="file" accept="image/*" onchange="pickCreationImage(${index}, this)" style="width:auto;">
                     </div>
+                    <div id="creation-preview-${index}" style="margin-top:10px;">
+                        ${item.image ? `<img src="${escapeAttr(item.image)}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">` : ''}
+                    </div>
                     
                     <label style="margin-top:10px;">紹介文</label>
                     <textarea onchange="updateCreation(${index}, 'description', this.value)" style="height:100px;">${item.description}</textarea>
@@ -566,7 +584,7 @@
 
         function addCreation() {
             const newId = "creation" + (new Date().getTime());
-            currentData.creations.push({
+            currentData.creations.unshift({
                 id: newId,
                 title: "新規創作物",
                 image: "",
@@ -597,8 +615,18 @@
             if (input.files && input.files.length > 0) {
                 const fileName = input.files[0].name;
                 updateCreation(index, 'image', fileName);
-                const textInput = document.getElementById(`creation-image-${index}`);
                 if (textInput) textInput.value = fileName;
+
+                // プレビュー表示
+                const previewDiv = document.getElementById(`creation-preview-${index}`);
+                if (previewDiv) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
         }
 
@@ -632,9 +660,9 @@
                 deleteBtn.style.borderRadius = "4px";
                 deleteBtn.style.cursor = "pointer";
 
-                deleteBtn.onclick = function () {
+                deleteBtn.addEventListener('click', function () {
                     removeSecret(index);
-                };
+                });
 
                 headerDiv.appendChild(titleStrong);
                 headerDiv.appendChild(deleteBtn);
@@ -653,6 +681,9 @@
                         <input type="text" id="secret-image-${index}" value="${escapeAttr(item.image)}" onchange="updateSecret(${index}, 'image', this.value)" style="flex:1;">
                         <input type="file" accept="image/*" onchange="pickSecretImage(${index}, this)" style="width:auto;">
                     </div>
+                    <div id="secret-preview-${index}" style="margin-top:10px;">
+                        ${item.image ? `<img src="${escapeAttr(item.image)}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">` : ''}
+                    </div>
                     
                     <label style="margin-top:10px;">紹介文</label>
                     <textarea onchange="updateSecret(${index}, 'description', this.value)" style="height:100px;">${item.description}</textarea>
@@ -664,7 +695,7 @@
 
         function addSecret() {
             const newId = "secret" + (new Date().getTime());
-            currentData.secrets.push({
+            currentData.secrets.unshift({
                 id: newId,
                 title: "新規の私的なこと",
                 image: "",
@@ -690,6 +721,17 @@
                 updateSecret(index, 'image', fileName);
                 const textInput = document.getElementById(`secret-image-${index}`);
                 if (textInput) textInput.value = fileName;
+
+                // プレビュー表示
+                const previewDiv = document.getElementById(`secret-preview-${index}`);
+                if (previewDiv) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
             }
         }
 
@@ -715,7 +757,7 @@
         }
 
         function addSchedule() {
-            currentData.schedule.push({ date: "", event: "" });
+            currentData.schedule.unshift({ date: "", event: "" });
             renderScheduleList();
         }
 
