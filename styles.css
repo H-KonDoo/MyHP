@@ -96,6 +96,8 @@ ul {
 /* 以前の縞模様や血しぶき表現をリセットするため、::afterは装飾に使う */
 /* 以前の縞模様や血しぶき表現をリセットするため、::afterは装飾に使う - 削除済み */
 
+/* Glow Animation */
+/* Static Glow Effect (No Animation) */
 .site-title {
     font-size: 2.5rem;
     font-weight: 900;
@@ -103,11 +105,15 @@ ul {
     letter-spacing: 0.1em;
     color: #e0e0e0;
     text-transform: uppercase;
-    text-shadow: 2px 2px 0 #000;
+
+    /* Static Green Glow */
+    text-shadow: 0 0 15px rgba(0, 255, 0, 0.8), 0 0 30px rgba(0, 255, 0, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+
     background-color: rgba(0, 0, 0, 0.6);
     display: inline-block;
     padding: 10px 30px;
-    border: 2px solid #666;
+    border: 2px solid silver;
     border-radius: 4px;
 }
 

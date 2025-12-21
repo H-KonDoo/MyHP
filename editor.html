@@ -203,7 +203,7 @@
 
 <body>
 
-    <h1>KonDo 紹介ページ 管理ツール</h1>
+    <h1>KonDo.FILE 管理ツール</h1>
     <p class="intro-text">
         このツールで内容を編集し、最後に「保存用データを作成」ボタンを押してください。<br>
         作成されたデータで <code>data.js</code> を上書き保存すると、ホームページ全体が更新されます。<br>
@@ -217,7 +217,8 @@
         <div class="tab" onclick="switchTab('games')">2. ゲームリスト</div>
         <div class="tab" onclick="switchTab('creations')">3. 創作物リスト</div>
         <div class="tab" onclick="switchTab('schedule')">4. メモ</div>
-        <div class="tab" onclick="switchTab('secrets')">5. 私的なこと</div>
+        <div class="tab" onclick="switchTab('terms')">5. 規約</div>
+        <div class="tab" onclick="switchTab('secrets')">6. 私的なこと</div>
         <div class="tab" style="background:#4CAF50; color:white;" onclick="generateDataFile()">★ 保存用データ作成</div>
     </div>
 
@@ -273,6 +274,16 @@
         </div>
 
         <!-- ==============================================
+             5. 規約リスト編集
+             ============================================== -->
+        <div id="view-terms" style="display:none;">
+            <h3>規約リスト編集</h3>
+            <div id="terms-container"></div>
+            <button class="action-btn" style="background:#666; margin-top:20px;" onclick="addTerm()">＋
+                規約を追加する</button>
+        </div>
+
+        <!-- ==============================================
              5. 私的なことリスト編集
              ============================================== -->
         <div id="view-secrets" style="display:none;">
@@ -312,6 +323,7 @@
             profile: { name: "", bio: "" },
             games: [],
             creations: [],
+            terms: [],
             secrets: [],
             schedule: []
         };
@@ -323,8 +335,9 @@
                 currentData = JSON.parse(JSON.stringify(portfolioData));
                 // 既存データにversionがない場合のフォールバック
                 if (!currentData.version) currentData.version = "1.0";
-                // 既存データにcreationsがない場合のフォールバック
                 if (!currentData.creations) currentData.creations = [];
+                // 既存データにtermsがない場合のフォールバック
+                if (!currentData.terms) currentData.terms = [];
                 // 既存データにsecretsがない場合のフォールバック
                 if (!currentData.secrets) currentData.secrets = [];
 
@@ -352,6 +365,9 @@
             // メモ
             renderScheduleList();
 
+            // 規約
+            renderTermsList();
+
             // 私的なこと
             renderSecretsList();
         }
@@ -364,6 +380,9 @@
             document.getElementById('view-games').style.display = 'none';
             document.getElementById('view-creations').style.display = 'none';
             document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-creations').style.display = 'none';
+            document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-terms').style.display = 'none';
             document.getElementById('view-secrets').style.display = 'none';
             document.getElementById('view-output').style.display = 'none';
 
@@ -381,6 +400,10 @@
             }
             if (mode === 'schedule') {
                 document.getElementById('view-schedule').style.display = 'block';
+                event.target.classList.add('active');
+            }
+            if (mode === 'terms') {
+                document.getElementById('view-terms').style.display = 'block';
                 event.target.classList.add('active');
             }
             if (mode === 'secrets') {
@@ -630,6 +653,110 @@
             }
         }
 
+        // ================= TERMS =================
+        function renderTermsList() {
+            const container = document.getElementById('terms-container');
+            container.innerHTML = "";
+            currentData.terms.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.style.border = "1px solid #ddd";
+                div.style.padding = "15px";
+                div.style.marginBottom = "20px";
+
+                const headerDiv = document.createElement('div');
+                headerDiv.style.display = "flex";
+                headerDiv.style.justifyContent = "space-between";
+                headerDiv.style.marginBottom = "10px";
+
+                const titleStrong = document.createElement('strong');
+                titleStrong.innerText = `規約 #${index + 1} (ID: ${item.id})`;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = "button";
+                deleteBtn.innerText = "削除";
+                deleteBtn.style.background = "#d32f2f";
+                deleteBtn.style.color = "white";
+                deleteBtn.style.border = "none";
+                deleteBtn.style.padding = "5px 10px";
+                deleteBtn.style.borderRadius = "4px";
+                deleteBtn.style.cursor = "pointer";
+
+                deleteBtn.addEventListener('click', function () {
+                    removeTerm(index);
+                });
+
+                headerDiv.appendChild(titleStrong);
+                headerDiv.appendChild(deleteBtn);
+                div.appendChild(headerDiv);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.innerHTML = `
+                    <label>タイトル</label>
+                    <input type="text" value="${escapeAttr(item.title)}" onchange="updateTerm(${index}, 'title', this.value)">
+                    
+                    <label style="margin-top:10px;">ID (英数字推奨)</label>
+                    <input type="text" value="${escapeAttr(item.id)}" onchange="updateTerm(${index}, 'id', this.value)">
+
+                    <label style="margin-top:10px;">画像ファイル名 (任意)</label>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="term-image-${index}" value="${escapeAttr(item.image)}" onchange="updateTerm(${index}, 'image', this.value)" style="flex:1;">
+                        <input type="file" accept="image/*" onchange="pickTermImage(${index}, this)" style="width:auto;">
+                    </div>
+                    <div id="term-preview-${index}" style="margin-top:10px;">
+                        ${item.image ? `<img src="${escapeAttr(item.image)}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">` : ''}
+                    </div>
+                    
+                    <label style="margin-top:10px;">規約本文</label>
+                    <textarea onchange="updateTerm(${index}, 'description', this.value)" style="height:100px;">${item.description}</textarea>
+                `;
+                div.appendChild(contentDiv);
+                container.appendChild(div);
+            });
+        }
+
+        function addTerm() {
+            const newId = "term" + (new Date().getTime());
+            currentData.terms.unshift({
+                id: newId,
+                title: "新規規約",
+                image: "",
+                description: "規約文を入力"
+            });
+            renderTermsList();
+        }
+
+        function removeTerm(index) {
+            if (confirm("この規約を削除してもよろしいですか？")) {
+                currentData.terms.splice(index, 1);
+                renderTermsList();
+            }
+        }
+
+        function updateTerm(index, field, value) {
+            currentData.terms[index][field] = value;
+        }
+
+        function pickTermImage(index, input) {
+            if (input.files && input.files.length > 0) {
+                const fileName = input.files[0].name;
+                updateTerm(index, 'image', fileName);
+                const textInput = document.getElementById(`term-image-${index}`);
+                if (textInput) textInput.value = fileName;
+
+                // プレビュー表示
+                const previewDiv = document.getElementById(`term-preview-${index}`);
+                if (previewDiv) {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="preview" style="max-height:100px; max-width:200px; border:1px solid #ddd; padding:2px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
         // ================= SECRETS =================
         function renderSecretsList() {
             const container = document.getElementById('secrets-container');
@@ -788,6 +915,7 @@ const portfolioData = ${jsonStr};
             document.getElementById('view-games').style.display = 'none';
             document.getElementById('view-creations').style.display = 'none';
             document.getElementById('view-schedule').style.display = 'none';
+            document.getElementById('view-terms').style.display = 'none';
             document.getElementById('view-secrets').style.display = 'none';
             document.getElementById('view-output').style.display = 'block'; // Show output
 

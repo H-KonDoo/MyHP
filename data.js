@@ -178,6 +178,14 @@ const portfolioData = {
             "date": "2025.12.10",
             "event": "HPを一旦つくってみた記録用"
         }
+    ],
+    "terms": [
+        {
+            "id": "term01",
+            "title": "利用規約",
+            "image": "",
+            "description": "ここに規約の内容を入力してください。"
+        }
     ]
 };
 

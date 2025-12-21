@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 検索エンジンに表示させない設定 -->
     <meta name="robots" content="noindex, nofollow">
-    <title>ゲーム詳細 - KonDoの紹介ページ</title>
+    <title>規約詳細 - KonDo.FILE</title>
     <link rel="stylesheet" href="styles.css">
     <!-- フォントの読み込み（Noto Sans JP） -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ゲーム詳細ページ専用のスタイル */
+        /* 詳細ページ専用のスタイル */
         .game-detail-header {
             margin-bottom: 40px;
         }
@@ -62,12 +62,13 @@
             <li><a href="index.html#games">ゲーム紹介</a></li>
             <li><a href="index.html#creations">創作物</a></li>
             <li><a href="index.html#schedule">メモ</a></li>
+            <li><a href="index.html#terms">規約</a></li>
         </ul>
     </nav>
 
     <main class="container" style="margin-top: 60px;">
         <!-- Javascriptでコンテンツを注入する空のコンテナ -->
-        <article class="game-detail" id="game-detail-display" style="display:none;">
+        <article class="game-detail" id="term-detail-display" style="display:none;">
             <header class="game-detail-header">
                 <h2 class="section-title" id="d-title"></h2>
             </header>
@@ -86,7 +87,7 @@
         <!-- エラーメッセージ用 -->
         <div id="error-message" style="display:none; padding:40px; text-align:center;">
             <h2>ページが見つかりません</h2>
-            <p>指定されたゲームIDが存在しないか、間違っています。</p>
+            <p>指定されたIDが存在しないか、間違っています。</p>
             <a href="index.html" class="back-to-top-btn">BACK TO PAGE</a>
         </div>
     </main>
@@ -104,24 +105,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             // URLパラメータから ?id=xxx を取得
             const urlParams = new URLSearchParams(window.location.search);
-            const gameId = urlParams.get('id');
+            const termId = urlParams.get('id');
 
-            if (!gameId || typeof portfolioData === 'undefined') {
+            if (!termId || typeof portfolioData === 'undefined') {
                 showError();
                 return;
             }
 
-            // data.js の games 配列から該当するIDを探す
-            const game = portfolioData.games.find(g => g.id === gameId);
+            // data.js の terms 配列から該当するIDを探す
+            // termsが存在しない場合のガード
+            if (!portfolioData.terms) {
+                showError();
+                return;
+            }
 
-            if (!game) {
+            const term = portfolioData.terms.find(t => t.id === termId);
+
+            if (!term) {
                 showError();
                 return;
             }
 
             // データを画面に反映
-            document.getElementById('d-title').innerText = game.title;
-            document.getElementById('d-description').innerHTML = game.description.replace(/\n/g, '<br>');
+            document.getElementById('d-title').innerText = term.title;
+            document.getElementById('d-description').innerHTML = term.description.replace(/\n/g, '<br>');
 
             // バージョン表示
             if (document.getElementById('site-version') && portfolioData.version) {
@@ -130,14 +137,16 @@
 
             // 画像の処理
             const imgArea = document.getElementById('d-image-area');
-            if (game.image && game.image.trim() !== "") {
-                imgArea.innerHTML = `<img src="${escapeHtml(game.image)}" alt="${escapeHtml(game.title)}" class="game-detail-image">`;
+            if (term.image && term.image.trim() !== "") {
+                imgArea.innerHTML = `<img src="${escapeHtml(term.image)}" alt="${escapeHtml(term.title)}" class="game-detail-image">`;
             } else {
-                imgArea.innerHTML = `<div class="game-detail-image"><span>画像なし</span></div>`;
+                imgArea.innerHTML = ""; // 画像がない場合は何も表示しない (規約などでは画像がない場合が多いかも)
+                // もし枠を残したければ下記を使う
+                // imgArea.innerHTML = `<div class="game-detail-image"><span>画像なし</span></div>`;
             }
 
             // 表示オン
-            document.getElementById('game-detail-display').style.display = 'block';
+            document.getElementById('term-detail-display').style.display = 'block';
         });
 
         function showError() {

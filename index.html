@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 検索エンジンに表示させない設定 -->
     <meta name="robots" content="noindex, nofollow">
-    <title>KonDoの紹介ページ</title>
+    <title>KonDo.FILE</title>
     <link rel="stylesheet" href="styles.css">
     <!-- フォントの読み込み（Noto Sans JP） -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
     <header class="site-header">
         <div class="container">
             <!-- サイトのタイトル -->
-            <h1 class="site-title"><a href="hidden.html" style="color: inherit;">KonDoの紹介ページ</a></h1>
+            <h1 class="site-title"><a href="hidden.html" style="color: inherit;">KonDo.FILES</a></h1>
         </div>
     </header>
 
@@ -28,9 +28,10 @@
     <nav class="site-nav">
         <ul>
             <li><a href="#profile">経歴</a></li>
-            <li><a href="#games">ゲーム紹介</a></li>
+            <li><a href="#games">ゲーム</a></li>
             <li><a href="#creations">創作物</a></li>
             <li><a href="#schedule">メモ</a></li>
+            <li><a href="#terms">規約</a></li>
         </ul>
     </nav>
 
@@ -77,6 +78,16 @@
         <section id="schedule" class="content-section">
             <h2 class="section-title">Memo (メモ)</h2>
             <ul class="game-link-list" id="schedule-list-display">
+                <!-- ここに data.js の内容が表示されます -->
+            </ul>
+        </section>
+
+        <!-- ==========================================
+             5. 規約 セクション
+             ========================================== -->
+        <section id="terms" class="content-section">
+            <h2 class="section-title">Terms (規約)</h2>
+            <ul class="game-link-list" id="terms-list-display">
                 <!-- ここに data.js の内容が表示されます -->
             </ul>
         </section>
@@ -142,6 +153,8 @@
                         displayText = escapeHtml(item.title);
                         if (containerId.includes("games")) {
                             linkUrl = `game_page.html?id=${item.id}`;
+                        } else if (containerId.includes("terms")) {
+                            linkUrl = `terms_page.html?id=${item.id}`;
                         } else {
                             linkUrl = `creation_page.html?id=${item.id}`;
                         }
@@ -210,6 +223,11 @@
             // 4. メモの表示 (ページネーション: 5件ごと)
             if (portfolioData.schedule) {
                 renderPaginatedList(portfolioData.schedule, 'schedule-list-display', 5);
+            }
+
+            // 5. 規約リストの表示 (ページネーション: 5件ごと)
+            if (portfolioData.terms) {
+                renderPaginatedList(portfolioData.terms, 'terms-list-display', 5);
             }
         });
 
